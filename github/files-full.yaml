@@ -1,0 +1,17 @@
+apiVersion: gh-infra/v1
+kind: FileSet
+metadata:
+  owner: wpfleger96
+
+spec:
+  repositories:
+    - ai-rules
+    - claude-code-status-line
+    - pagerduty-mcp-server
+
+  files:
+    - path: .github/workflows/publish.yml
+      source: ./templates/publish.yml
+
+  via: push
+  commit_message: "ci: sync publish workflow"

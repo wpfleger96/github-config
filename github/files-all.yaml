@@ -1,0 +1,29 @@
+apiVersion: gh-infra/v1
+kind: FileSet
+metadata:
+  owner: wpfleger96
+
+spec:
+  repositories:
+    - ai-rules
+    - claude-code-status-line
+    - pagerduty-mcp-server
+    - recall
+    - SNORE
+    - name: shell-configs
+      overrides:
+        - path: .github/workflows/ci.yml
+          source: ./templates/ci-shell.yml
+    - name: homelabconfigs
+      overrides:
+        - path: .github/workflows/ci.yml
+          source: ./templates/ci-infra.yml
+
+  files:
+    - path: .github/workflows/ci.yml
+      source: ./templates/ci-python.yml
+    - path: .github/workflows/dependabot-automerge.yml
+      source: ./templates/dependabot-automerge.yml
+
+  via: push
+  commit_message: "ci: sync shared files"
