@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install gh-infra
+        run: gh extension install babarot/gh-infra --pin v0.13.0
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Validate gh-infra manifests
+        run: gh infra validate github/
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Install actionlint
+        run: bash <(curl -sSL https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
+
+      - name: Lint workflow templates
+        run: ./actionlint github/templates/*.yml
+        env:
+          GITHUB_TOKEN: ${{ github.token }}

@@ -5,7 +5,7 @@ metadata:
 
 spec:
   repositories:
-    - ai-rules
+    - ai-agent-rules
     - claude-code-status-line
     - pagerduty-mcp-server
     - shell-configs
