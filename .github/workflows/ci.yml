@@ -25,7 +25,10 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
 
+      - name: Install actionlint
+        run: bash <(curl -sSL https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
+
       - name: Lint workflow templates
-        run: actionlint github/templates/*.yml
+        run: ./actionlint github/templates/*.yml
         env:
           GITHUB_TOKEN: ${{ github.token }}
