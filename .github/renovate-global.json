@@ -1,0 +1,18 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "username": "wpfleger-release-bot[bot]",
+  "gitAuthor": "wpfleger-release-bot <282999489+wpfleger-release-bot[bot]@users.noreply.github.com>",
+  "platform": "github",
+  "repositories": [
+    "wpfleger96/ai-agent-rules",
+    "wpfleger96/claude-code-status-line",
+    "wpfleger96/pagerduty-mcp-server",
+    "wpfleger96/shell-configs",
+    "wpfleger96/recall",
+    "wpfleger96/SNORE",
+    "wpfleger96/homelabconfigs",
+    "wpfleger96/github-config"
+  ],
+  "onboarding": false,
+  "requireConfig": "optional"
+}
