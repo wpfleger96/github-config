@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write
 
 jobs:
   plan:
@@ -30,6 +31,31 @@ jobs:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
 
       - name: Plan infra changes
-        run: gh infra plan github/
+        run: gh infra plan github/ 2>&1 | tee /tmp/plan-output.txt
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
+
+      - name: Comment plan on PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo '<!-- infra-plan -->'
+            echo '### Infra Plan'
+            echo ''
+            echo '```'
+            cat /tmp/plan-output.txt
+            echo '```'
+          } > /tmp/comment-body.md
+
+          COMMENT_ID=$(gh api "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
+            --jq '.[] | select(.body | contains("<!-- infra-plan -->")) | .id' \
+            | head -1)
+
+          if [ -n "$COMMENT_ID" ]; then
+            jq -n --rawfile body /tmp/comment-body.md '{body: $body}' | \
+              gh api "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments/${COMMENT_ID}" \
+                --method PATCH --input -
+          else
+            gh pr comment "${{ github.event.pull_request.number }}" --body-file /tmp/comment-body.md
+          fi
