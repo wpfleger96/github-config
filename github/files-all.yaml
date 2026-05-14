@@ -22,8 +22,8 @@ spec:
   files:
     - path: .github/workflows/ci.yml
       source: ./templates/ci-python.yml
-    - path: .github/workflows/dependabot-automerge.yml
-      source: ./templates/dependabot-automerge.yml
+    - path: renovate.json
+      source: ./templates/renovate.json
 
   via: push
   commit_message: "ci: sync shared files"

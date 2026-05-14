@@ -1,0 +1,10 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "username": "wpfleger-release-bot[bot]",
+  "gitAuthor": "wpfleger-release-bot <282999489+wpfleger-release-bot[bot]@users.noreply.github.com>",
+  "platform": "github",
+  "autodiscover": true,
+  "autodiscoverFilter": ["wpfleger96/*"],
+  "onboarding": false,
+  "requireConfig": "required"
+}
