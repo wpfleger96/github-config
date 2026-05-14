@@ -77,13 +77,34 @@ defaults:
 repositories:
 - name: ai-agent-rules
   spec:
-    description: "Consolidates config files for AI coding agents into a single source of truth via symlinks"
+    description: "Manage configs for Claude Code, Codex, Gemini CLI, Goose, and Amp from one repo — symlinks, merge pipeline, profile inheritance, cross-machine sync"
+    topics:
+    - python
+    - ai
+    - llm
+    - claude-code
+    - coding-agents
 - name: claude-code-status-line
   spec:
-    description: "Claude Code status line script displaying a HUD with helpful session information like current model, working directory, and context usage information"
+    description: "Real-time status bar for Claude Code showing model, context usage, session cost, git state, and token counts via the native status line hook"
+    topics:
+    - python
+    - claude-code
+    - cli
+    - status-line
 - name: pagerduty-mcp-server
   spec:
-    description: "PagerDuty MCP Server for LLM Agent Integration"
+    description: "MCP server exposing PagerDuty incidents, services, schedules, and on-calls to AI agents — read, acknowledge, resolve, with OAuth and API key auth"
+    topics:
+    - python
+    - mcp
+    - pagerduty
+    - llm
 - name: github-config
   spec:
     description: "Declarative GitHub repo configuration management (gh-infra + Renovate)"
+    topics:
+    - github
+    - gitops
+    - renovate
+    - gh-infra

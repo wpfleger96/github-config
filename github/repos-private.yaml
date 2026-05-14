@@ -39,6 +39,12 @@ defaults:
 repositories:
 - name: shell-configs
   spec:
+    description: "Declarative dev environment manager — shell configs, packages, VS Code/Cursor settings and extensions, git, GPG signing, gh CLI extensions, and iTerm2 profiles"
+    topics:
+    - python
+    - dotfiles
+    - shell
+    - cli
     actions:
       workflow_permissions: write
     variables:
@@ -50,9 +56,23 @@ repositories:
 - name: recall
   spec:
     description: "Recall is a GitHub-backed markdown wiki exposed to agents via MCP server"
+    topics:
+    - python
+    - mcp
+    - knowledge-base
+    - markdown
 - name: SNORE
   spec:
-    description: ""
+    description: "Parses ResMed CPAP binary data, scores respiratory events against AASM clinical standards, and serves results via CLI, REST API, and Vue web UI"
+    topics:
+    - python
+    - sleep
+    - cpap
 - name: homelabconfigs
   spec:
-    description: ""
+    description: "Homelab infrastructure configuration — Terraform, Ansible, and Raspberry Pi"
+    topics:
+    - homelab
+    - terraform
+    - ansible
+    - raspberry-pi
