@@ -39,7 +39,7 @@ defaults:
 repositories:
 - name: shell-configs
   spec:
-    description: "CLI that installs a curated shell environment — git aliases, worktree management, AI tool shortcuts — via non-destructive config injection with automatic backups"
+    description: "Declarative dev environment manager — shell configs, packages, VS Code/Cursor settings and extensions, git, GPG signing, gh CLI extensions, and iTerm2 profiles"
     topics:
     - python
     - dotfiles
