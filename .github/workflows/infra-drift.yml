@@ -1,0 +1,34 @@
+name: Infra Drift Detection
+
+on:
+  schedule:
+    - cron: "0 9 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  detect-drift:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Generate App token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - name: Install gh-infra
+        run: gh extension install babarot/gh-infra --pin v0.13.0
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+
+      - name: Detect drift
+        run: gh infra plan github/ --ci
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}

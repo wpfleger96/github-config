@@ -1,0 +1,35 @@
+name: Infra Plan
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "github/**"
+
+permissions:
+  contents: read
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Generate App token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - name: Install gh-infra
+        run: gh extension install babarot/gh-infra --pin v0.13.0
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+
+      - name: Plan infra changes
+        run: gh infra plan github/
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}

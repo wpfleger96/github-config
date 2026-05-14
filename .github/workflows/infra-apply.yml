@@ -1,0 +1,38 @@
+name: Infra Apply
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "github/**"
+
+permissions:
+  contents: read
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    concurrency:
+      group: infra-apply
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Generate App token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - name: Install gh-infra
+        run: gh extension install babarot/gh-infra --pin v0.13.0
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+
+      - name: Apply infra changes
+        run: gh infra apply github/ --auto-approve
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
