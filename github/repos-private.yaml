@@ -39,6 +39,12 @@ defaults:
 repositories:
 - name: shell-configs
   spec:
+    description: "Declarative shell environment management — dotfiles, packages, extensions, and signing"
+    topics:
+    - python
+    - dotfiles
+    - shell
+    - cli
     actions:
       workflow_permissions: write
     variables:
@@ -50,9 +56,23 @@ repositories:
 - name: recall
   spec:
     description: "Recall is a GitHub-backed markdown wiki exposed to agents via MCP server"
+    topics:
+    - python
+    - mcp
+    - knowledge-base
+    - markdown
 - name: SNORE
   spec:
-    description: ""
+    description: "CPAP sleep data analysis and reporting"
+    topics:
+    - python
+    - sleep
+    - cpap
 - name: homelabconfigs
   spec:
-    description: ""
+    description: "Homelab infrastructure configuration — Terraform, Ansible, and Raspberry Pi"
+    topics:
+    - homelab
+    - terraform
+    - ansible
+    - raspberry-pi
