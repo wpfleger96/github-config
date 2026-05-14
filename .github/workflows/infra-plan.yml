@@ -8,7 +8,6 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write
 
 jobs:
   plan:
@@ -39,14 +38,14 @@ jobs:
 
       - name: Comment plan on PR
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
           {
             echo '<!-- infra-plan -->'
             echo '### Infra Plan'
             echo ''
             echo '```'
-            sed 's/\x1b\[[0-9;]*m//g; s/\x1b\]8;;[^\x1b]*\x1b\\//g' /tmp/plan-raw.txt
+            sed $'s/\x1b\[[0-9;]*m//g; s/\x1b\]8;;[^\x1b]*\x1b\\\\/\n/g' /tmp/plan-raw.txt | sed 's/\x1b\]8;;[^ ]*//g'
             echo '```'
           } > /tmp/comment-body.md
 
