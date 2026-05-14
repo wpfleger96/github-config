@@ -39,7 +39,7 @@ defaults:
 repositories:
 - name: shell-configs
   spec:
-    description: "Declarative shell environment management — dotfiles, packages, extensions, and signing"
+    description: "CLI that installs a curated shell environment — git aliases, worktree management, AI tool shortcuts — via non-destructive config injection with automatic backups"
     topics:
     - python
     - dotfiles
@@ -63,7 +63,7 @@ repositories:
     - markdown
 - name: SNORE
   spec:
-    description: "CPAP sleep data analysis and reporting"
+    description: "Parses ResMed CPAP binary data, scores respiratory events against AASM clinical standards, and serves results via CLI, REST API, and Vue web UI"
     topics:
     - python
     - sleep
