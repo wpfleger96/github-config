@@ -41,11 +41,17 @@ jobs:
       - name: Run type checks
         run: just type-check
 
-      - name: Run linter
-        run: just lint-check
+      - name: Run Python linter
+        run: just lint-python-check
 
-      - name: Run formatter
-        run: just format-check
+      - name: Run shell linter
+        run: just lint-shell-check
+
+      - name: Run Python formatter
+        run: just format-python-check
+
+      - name: Run shell formatter
+        run: just format-shell-check
 
       - name: Run tests
         run: just test
