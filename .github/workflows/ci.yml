@@ -23,7 +23,7 @@ jobs:
       - name: Install gh-infra (fork with override fix)
         run: |
           git clone --depth 1 https://github.com/wpfleger96/gh-infra.git /tmp/gh-infra
-          cd /tmp/gh-infra && go build -o gh-infra .
+          cd /tmp/gh-infra && go build -o gh-infra ./cmd/gh-infra/
           EXT_DIR="$(gh config get extensions_dir 2>/dev/null || echo "${HOME}/.local/share/gh/extensions")/gh-infra"
           mkdir -p "$EXT_DIR"
           mv gh-infra "$EXT_DIR/gh-infra"
