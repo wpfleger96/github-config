@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: Install gh-infra
-        run: gh extension install babarot/gh-infra --pin v0.13.0
+        run: gh extension install wpfleger96/gh-infra
         env:
           GH_TOKEN: ${{ github.token }}
 
