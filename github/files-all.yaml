@@ -8,12 +8,17 @@ spec:
     - ai-agent-rules
     - claude-code-status-line
     - pagerduty-mcp-server
-    - recall
+    - name: recall
+      overrides:
+        - path: .github/workflows/ci.yml
+          vars:
+            git_identity: "true"
     - SNORE
     - name: shell-configs
       overrides:
         - path: .github/workflows/ci.yml
-          source: ./templates/ci-shell.yml
+          vars:
+            shell: "true"
     - name: homelabconfigs
       overrides:
         - path: .github/workflows/ci.yml

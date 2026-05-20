@@ -39,6 +39,7 @@ jobs:
         run: bash <(curl -sSL https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
 
       - name: Lint workflow templates
-        run: ./actionlint github/templates/*.yml
+        # ci-python.yml excluded: contains gh-infra <% %> template directives that aren't valid YAML
+        run: ./actionlint github/templates/ci-infra.yml github/templates/publish.yml github/templates/release.yml
         env:
           GITHUB_TOKEN: ${{ github.token }}
