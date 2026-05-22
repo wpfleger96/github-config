@@ -23,21 +23,21 @@ jobs:
           private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
 
+      - name: Clone gh-infra
+        run: git clone --depth 1 https://github.com/wpfleger96/gh-infra.git /tmp/gh-infra
+
       - name: Set up Go
         uses: actions/setup-go@v6
         with:
           go-version: stable
-          cache: false
+          cache-dependency-path: /tmp/gh-infra/go.sum
 
-      - name: Install gh-infra (fork with override fix)
+      - name: Build and install gh-infra
         run: |
-          git clone --depth 1 https://github.com/wpfleger96/gh-infra.git /tmp/gh-infra
           cd /tmp/gh-infra && go build -o gh-infra ./cmd/gh-infra/
           EXT_DIR="$(gh config get extensions_dir 2>/dev/null || echo "${HOME}/.local/share/gh/extensions")/gh-infra"
           mkdir -p "$EXT_DIR"
           mv gh-infra "$EXT_DIR/gh-infra"
-        env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
 
       - name: Detect drift
         run: gh infra plan github/ --ci
