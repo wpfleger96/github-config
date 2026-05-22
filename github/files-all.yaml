@@ -8,6 +8,7 @@ spec:
     - ai-agent-rules
     - claude-code-status-line
     - pagerduty-mcp-server
+    - JamBot
     - name: recall
       overrides:
         - path: .github/workflows/ci.yml
