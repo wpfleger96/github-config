@@ -29,6 +29,8 @@ spec:
       source: ./templates/ci-python.yml
     - path: renovate.json
       source: ./templates/renovate.json
+    - path: .github/workflows/auto-approve.yml
+      source: ./templates/auto-approve.yml
 
   via: push
   commit_message: "ci: sync shared files"

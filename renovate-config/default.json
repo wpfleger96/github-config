@@ -11,6 +11,11 @@
   "commitMessagePrefix": "chore(deps):",
   "platformAutomerge": true,
   "automergeType": "pr",
+  "minimumReleaseAge": "3 days",
+  "internalChecksFilter": "strict",
+  "vulnerabilityAlerts": {
+    "enabled": false
+  },
   "lockFileMaintenance": {
     "enabled": true,
     "automerge": true
@@ -24,6 +29,26 @@
     },
     {
       "matchUpdateTypes": ["major"],
+      "automerge": false
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "automerge": false,
+      "groupName": "github-actions",
+      "groupSlug": "github-actions"
+    },
+    {
+      "matchManagers": ["pyenv", "nvm", "nodenv", "asdf", "mise"],
+      "automerge": false,
+      "groupName": "language runtimes",
+      "groupSlug": "language-runtimes"
+    },
+    {
+      "matchDatasources": ["python-version", "node-version"],
+      "automerge": false
+    },
+    {
+      "matchDepNames": ["python", "node", "ruby", "golang", "openjdk", "eclipse-temurin"],
       "automerge": false
     }
   ]
