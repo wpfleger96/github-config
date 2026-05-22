@@ -14,7 +14,9 @@
   "minimumReleaseAge": "3 days",
   "internalChecksFilter": "strict",
   "vulnerabilityAlerts": {
-    "enabled": false
+    "enabled": true,
+    "labels": ["security"],
+    "automerge": true
   },
   "lockFileMaintenance": {
     "enabled": true,

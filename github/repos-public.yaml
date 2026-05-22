@@ -28,7 +28,7 @@ defaults:
     release_immutability: false
     security:
       vulnerability_alerts: true
-      automated_security_fixes: true
+      automated_security_fixes: false
       private_vulnerability_reporting: true
     rulesets:
     - name: main
@@ -63,6 +63,8 @@ defaults:
     variables:
     - name: RELEASE_APP_ID
       value: "3648544"
+    - name: RELEASE_APP_CLIENT_ID
+      value: "Iv23lidipoTqvoMln1Di"
     secrets:
     - name: RELEASE_APP_PRIVATE_KEY
       value: "${RELEASE_APP_PRIVATE_KEY}"
