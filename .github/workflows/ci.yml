@@ -22,7 +22,7 @@ jobs:
         uses: actions/setup-go@v6
         with:
           go-version: stable
-          cache-dependency-path: /tmp/gh-infra/go.sum
+          cache: false
 
       - name: Build and install gh-infra
         run: |
