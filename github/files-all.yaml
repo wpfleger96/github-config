@@ -8,6 +8,7 @@ spec:
     - ai-agent-rules
     - claude-code-status-line
     - pagerduty-mcp-server
+    - JamBot
     - name: recall
       overrides:
         - path: .github/workflows/ci.yml
@@ -29,6 +30,8 @@ spec:
       source: ./templates/ci-python.yml
     - path: renovate.json
       source: ./templates/renovate.json
+    - path: .github/workflows/auto-approve.yml
+      source: ./templates/auto-approve.yml
 
   via: push
   commit_message: "ci: sync shared files"
