@@ -14,7 +14,11 @@ spec:
         - path: .github/workflows/ci.yml
           vars:
             git_identity: "true"
-    - SNORE
+    - name: SNORE
+      overrides:
+        - path: .github/workflows/ci.yml
+          vars:
+            ui: "true"
     - name: shell-configs
       overrides:
         - path: .github/workflows/ci.yml

@@ -1,0 +1,37 @@
+apiVersion: gh-infra/v1
+kind: FileSet
+metadata:
+  owner: wpfleger96
+
+spec:
+  repositories:
+    - name: ai-agent-rules
+      overrides:
+        - path: Justfile
+          vars:
+            validate_schemas: "true"
+    - claude-code-status-line
+    - pagerduty-mcp-server
+    - JamBot
+    - name: recall
+      overrides:
+        - path: Justfile
+          vars:
+            rebuild_index: "true"
+    - name: SNORE
+      overrides:
+        - path: Justfile
+          vars:
+            ui: "true"
+    - name: shell-configs
+      overrides:
+        - path: Justfile
+          vars:
+            shell: "true"
+
+  files:
+    - path: Justfile
+      source: ./templates/Justfile
+
+  via: push
+  commit_message: "chore: sync Justfile"

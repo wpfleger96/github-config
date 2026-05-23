@@ -1,0 +1,174 @@
+# Settings
+set dotenv-load := false
+<%- if (index .Vars "shell") %>
+
+# Default recipe: quick quality check without tests
+default: sync type-check lint-python-check lint-shell-check format-python-check format-shell-check
+<%- else if (index .Vars "ui") %>
+
+# Default recipe: quick quality check without tests
+default: sync type-check lint-check format-check ui-type-check ui-lint-check ui-format-check
+<%- else %>
+
+# Default recipe: quick quality check without tests
+default: sync type-check lint-check format-check
+<%- end %>
+
+# Setup & Dependencies
+sync:
+    uv sync
+
+# Code Quality - Check variants
+type-check:
+    uv run mypy .
+<%- if (index .Vars "shell") %>
+
+lint-python-check:
+    uvx ruff check .
+
+lint-shell-check:
+    shfmt -f . | grep -v git-prompt.sh | grep -v iterm2-shell-integration | grep -v 'src/shell_configs/scripts/' | xargs shellcheck
+
+format-python-check:
+    uvx ruff format . --check
+
+format-shell-check:
+    shfmt -f . | grep -v git-prompt.sh | grep -v iterm2-shell-integration | grep -v 'src/shell_configs/scripts/' | xargs shfmt -d
+
+# Code Quality - Fix variants
+lint-python:
+    uvx ruff check . --fix
+
+format-python:
+    uvx ruff format .
+
+format-shell:
+    shfmt -f . | grep -v git-prompt.sh | grep -v iterm2-shell-integration | grep -v 'src/shell_configs/scripts/' | xargs shfmt -w
+
+# Composite quality checks (lint-check/format-check used by CI workflow)
+lint-check: lint-python-check lint-shell-check
+
+format-check: format-python-check format-shell-check
+
+check: sync type-check lint-check format-check
+    @echo "Quick quality checks passed"
+
+check-all: check test
+    @echo "All quality checks and tests passed"
+
+pre-commit: sync type-check lint-python lint-shell-check format-python format-shell test
+    @echo "Pre-commit checks passed"
+<%- else %>
+
+lint-check:
+    uvx ruff check .
+
+format-check:
+    uvx ruff format . --check
+
+# Code Quality - Fix variants
+lint:
+    uvx ruff check . --fix
+
+format:
+    uvx ruff format .
+<%- if (index .Vars "ui") %>
+
+# UI Code Quality - Check variants
+ui-type-check:
+    cd ui && npm run type-check
+
+ui-lint-check:
+    cd ui && npm run lint-check
+
+ui-format-check:
+    cd ui && npm run format-check
+
+# UI Code Quality - Fix variants
+ui-lint:
+    cd ui && npm run lint
+
+ui-format:
+    cd ui && npm run format
+
+# Composite quality checks
+check: sync type-check lint-check format-check ui-type-check ui-lint-check ui-format-check
+    @echo "Quick quality checks passed"
+
+check-all: check test
+    @echo "All quality checks and tests passed"
+
+pre-commit: sync type-check lint format ui-type-check ui-lint ui-format test
+    @echo "Pre-commit checks passed"
+<%- else %>
+
+# Composite quality checks
+check: sync type-check lint-check format-check
+    @echo "Quick quality checks passed"
+
+check-all: check test
+    @echo "All quality checks and tests passed"
+
+pre-commit: sync type-check lint format test
+    @echo "Pre-commit checks passed"
+<%- end %>
+<%- end %>
+
+# Testing
+test:
+    uv run pytest
+
+test-unit:
+    uv run pytest -m unit
+
+test-integration:
+    uv run pytest -m integration
+<%- if (index .Vars "validate_schemas") %>
+
+validate-schemas:
+    uv run pytest -m schema
+<%- end %>
+
+# Build & Package
+build: sync
+    uv build
+
+clean-build:
+    rm -rf dist/ build/ src/*.egg-info
+
+rebuild: clean-build build
+<%- if (index .Vars "rebuild_index") %>
+
+# Rebuild FTS5 search index from scratch
+rebuild-index:
+    uv run recall rebuild-index
+<%- end %>
+<%- if (index .Vars "ui") %>
+
+# UI Development
+dev-api:
+    uv run snore serve --reload
+
+dev-ui:
+    cd ui && npm run dev
+
+ui-install:
+    cd ui && npm install
+
+ui-build:
+    cd ui && npm run build
+
+# CI workflow (matches CI steps)
+ci: sync type-check lint-check format-check ui-type-check ui-lint-check ui-format-check test
+    @echo "CI checks passed"
+<%- else if (index .Vars "shell") %>
+
+# CI workflow (matches CI steps)
+ci: sync type-check lint-python-check lint-shell-check format-python-check format-shell-check test
+    @echo "CI checks passed"
+<%- else %>
+
+# CI workflow (matches CI steps)
+ci: sync type-check lint-check format-check test
+    @echo "CI checks passed"
+<%- end %>

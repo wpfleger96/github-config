@@ -43,6 +43,16 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
       <%- end %>
+      <%- if (index .Vars "ui") %>
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
+
+      - name: Install UI dependencies
+        run: just ui-install
+      <%- end %>
 
       - name: Install dependencies
         run: just sync
@@ -73,3 +83,14 @@ jobs:
 
       - name: Run tests
         run: just test
+      <%- if (index .Vars "ui") %>
+
+      - name: Run UI type checks
+        run: just ui-type-check
+
+      - name: Run UI linter
+        run: just ui-lint-check
+
+      - name: Run UI formatter
+        run: just ui-format-check
+      <%- end %>
