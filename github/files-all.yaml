@@ -17,8 +17,7 @@ spec:
     - name: SNORE
       overrides:
         - path: .github/workflows/ci.yml
-          vars:
-            ui: "true"
+          source: ./templates/ci-snore.yml
     - name: shell-configs
       overrides:
         - path: .github/workflows/ci.yml

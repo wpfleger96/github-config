@@ -5,24 +5,12 @@ metadata:
 
 spec:
   repositories:
-    - name: ai-agent-rules
-      overrides:
-        - path: Justfile
-          vars:
-            validate_schemas: "true"
+    - ai-agent-rules
     - claude-code-status-line
     - pagerduty-mcp-server
     - JamBot
-    - name: recall
-      overrides:
-        - path: Justfile
-          vars:
-            rebuild_index: "true"
-    - name: SNORE
-      overrides:
-        - path: Justfile
-          vars:
-            ui: "true"
+    - recall
+    - SNORE
     - name: shell-configs
       overrides:
         - path: Justfile

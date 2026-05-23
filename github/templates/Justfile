@@ -4,10 +4,6 @@ set dotenv-load := false
 
 # Default recipe: quick quality check without tests
 default: sync type-check lint-python-check lint-shell-check format-python-check format-shell-check
-<%- else if (index .Vars "ui") %>
-
-# Default recipe: quick quality check without tests
-default: sync type-check lint-check format-check ui-type-check ui-lint-check ui-format-check
 <%- else %>
 
 # Default recipe: quick quality check without tests
@@ -72,35 +68,6 @@ lint:
 
 format:
     uvx ruff format .
-<%- if (index .Vars "ui") %>
-
-# UI Code Quality - Check variants
-ui-type-check:
-    cd ui && npm run type-check
-
-ui-lint-check:
-    cd ui && npm run lint-check
-
-ui-format-check:
-    cd ui && npm run format-check
-
-# UI Code Quality - Fix variants
-ui-lint:
-    cd ui && npm run lint
-
-ui-format:
-    cd ui && npm run format
-
-# Composite quality checks
-check: sync type-check lint-check format-check ui-type-check ui-lint-check ui-format-check
-    @echo "Quick quality checks passed"
-
-check-all: check test
-    @echo "All quality checks and tests passed"
-
-pre-commit: sync type-check lint format ui-type-check ui-lint ui-format test
-    @echo "Pre-commit checks passed"
-<%- else %>
 
 # Composite quality checks
 check: sync type-check lint-check format-check
@@ -112,7 +79,6 @@ check-all: check test
 pre-commit: sync type-check lint format test
     @echo "Pre-commit checks passed"
 <%- end %>
-<%- end %>
 
 # Testing
 test:
@@ -123,11 +89,6 @@ test-unit:
 
 test-integration:
     uv run pytest -m integration
-<%- if (index .Vars "validate_schemas") %>
-
-validate-schemas:
-    uv run pytest -m schema
-<%- end %>
 
 # Build & Package
 build: sync
@@ -137,31 +98,7 @@ clean-build:
     rm -rf dist/ build/ src/*.egg-info
 
 rebuild: clean-build build
-<%- if (index .Vars "rebuild_index") %>
-
-# Rebuild FTS5 search index from scratch
-rebuild-index:
-    uv run recall rebuild-index
-<%- end %>
-<%- if (index .Vars "ui") %>
-
-# UI Development
-dev-api:
-    uv run snore serve --reload
-
-dev-ui:
-    cd ui && npm run dev
-
-ui-install:
-    cd ui && npm install
-
-ui-build:
-    cd ui && npm run build
-
-# CI workflow (matches CI steps)
-ci: sync type-check lint-check format-check ui-type-check ui-lint-check ui-format-check test
-    @echo "CI checks passed"
-<%- else if (index .Vars "shell") %>
+<%- if (index .Vars "shell") %>
 
 # CI workflow (matches CI steps)
 ci: sync type-check lint-python-check lint-shell-check format-python-check format-shell-check test
@@ -172,3 +109,5 @@ ci: sync type-check lint-python-check lint-shell-check format-python-check forma
 ci: sync type-check lint-check format-check test
     @echo "CI checks passed"
 <%- end %>
+
+import? 'local.just'

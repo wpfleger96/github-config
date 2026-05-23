@@ -31,45 +31,35 @@ jobs:
 
       - name: Install just
         uses: extractions/setup-just@v4
-      <%- if (index .Vars "shell") %>
 
-      - name: Install shfmt
-        uses: mfinelli/setup-shfmt@v4
-      <%- end %>
-      <%- if (index .Vars "git_identity") %>
-
-      - name: Configure git identity
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-      <%- end %>
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
 
       - name: Install dependencies
         run: just sync
 
+      - name: Install UI dependencies
+        run: just ui-install
+
       - name: Run type checks
         run: just type-check
-      <%- if (index .Vars "shell") %>
-
-      - name: Run Python linter
-        run: just lint-python-check
-
-      - name: Run shell linter
-        run: just lint-shell-check
-
-      - name: Run Python formatter
-        run: just format-python-check
-
-      - name: Run shell formatter
-        run: just format-shell-check
-      <%- else %>
 
       - name: Run linter
         run: just lint-check
 
       - name: Run formatter
         run: just format-check
-      <%- end %>
+
+      - name: Run UI type checks
+        run: just ui-type-check
+
+      - name: Run UI linter
+        run: just ui-lint-check
+
+      - name: Run UI formatter
+        run: just ui-format-check
 
       - name: Run tests
         run: just test
