@@ -29,7 +29,7 @@ jobs:
           owner: ${{ github.repository_owner }}
 
       - name: Clone gh-infra
-        run: git clone --depth 1 https://github.com/wpfleger96/gh-infra.git /tmp/gh-infra
+        run: git clone --depth 1 -b dev https://github.com/wpfleger96/gh-infra.git /tmp/gh-infra
 
       - name: Set up Go
         uses: actions/setup-go@v6
