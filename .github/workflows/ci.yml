@@ -41,6 +41,7 @@ jobs:
 
       - name: Lint workflow templates
         # ci-python.yml excluded: contains gh-infra <% %> template directives that aren't valid YAML
-        run: ./actionlint github/templates/ci-infra.yml github/templates/publish.yml github/templates/release.yml
+        # release.yml excluded: actionlint#648 — stale @v3 metadata missing client-id input
+        run: ./actionlint github/templates/ci-infra.yml github/templates/publish.yml
         env:
           GITHUB_TOKEN: ${{ github.token }}
