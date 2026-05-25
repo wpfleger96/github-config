@@ -19,24 +19,36 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Read Terraform version
+        id: tf-version
+        run: echo "version=$(cat .terraform-version)" >> "$GITHUB_OUTPUT"
+
       - name: Install just
         uses: extractions/setup-just@v4
+        with:
+          just-version: '1.51.0'
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v4
         with:
+          terraform_version: ${{ steps.tf-version.outputs.version }}
           terraform_wrapper: false
 
       - name: Set up TFLint
         uses: terraform-linters/setup-tflint@v6
+        with:
+          tflint_version: v0.62.1
 
       - name: Install shellcheck
-        run: sudo apt-get install -y shellcheck
+        run: |
+          VERSION=v0.11.0
+          curl -sSL "https://github.com/koalaman/shellcheck/releases/download/${VERSION}/shellcheck-${VERSION}.linux.x86_64.tar.xz" | tar xJ
+          sudo mv "shellcheck-${VERSION}/shellcheck" /usr/local/bin/
 
       - name: Install shfmt
-        run: |
-          curl -sS https://webi.sh/shfmt | sh
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+        uses: mfinelli/setup-shfmt@v3
+        with:
+          shfmt-version: '3.13.1'
 
       - name: Install PowerShell
         run: |
@@ -45,10 +57,10 @@ jobs:
 
       - name: Install PSScriptAnalyzer
         shell: pwsh
-        run: Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser
+        run: Install-Module -Name PSScriptAnalyzer -RequiredVersion 1.25.0 -Force -Scope CurrentUser
 
       - name: Install ansible-lint
-        run: pip install ansible-lint
+        run: pip install -r requirements-dev.txt
 
       - name: Initialize TFLint
         run: tflint --init --chdir=terraform
