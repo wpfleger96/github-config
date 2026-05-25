@@ -33,6 +33,8 @@ spec:
       source: ./templates/ci-python.yml
     - path: renovate.json
       source: ./templates/renovate.json
+    - path: uv.toml
+      source: ./templates/uv.toml
     - path: .github/workflows/auto-approve.yml
       source: ./templates/auto-approve.yml
 
