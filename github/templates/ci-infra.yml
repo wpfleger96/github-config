@@ -22,12 +22,14 @@ jobs:
       - name: Read tool versions
         id: versions
         run: |
-          echo "terraform=$(grep '^terraform ' .tool-versions | awk '{print $2}')" >> "$GITHUB_OUTPUT"
-          echo "tflint=v$(grep '^tflint ' .tool-versions | awk '{print $2}')" >> "$GITHUB_OUTPUT"
-          echo "shellcheck=v$(grep '^shellcheck ' .tool-versions | awk '{print $2}')" >> "$GITHUB_OUTPUT"
-          echo "shfmt=$(grep '^shfmt ' .tool-versions | awk '{print $2}')" >> "$GITHUB_OUTPUT"
-          echo "just=$(grep '^just ' .tool-versions | awk '{print $2}')" >> "$GITHUB_OUTPUT"
-          echo "ansible-lint=$(grep '^ansible-lint ' .tool-versions | awk '{print $2}')" >> "$GITHUB_OUTPUT"
+          {
+            echo "terraform=$(grep '^terraform ' .tool-versions | awk '{print $2}')"
+            echo "tflint=v$(grep '^tflint ' .tool-versions | awk '{print $2}')"
+            echo "shellcheck=v$(grep '^shellcheck ' .tool-versions | awk '{print $2}')"
+            echo "shfmt=$(grep '^shfmt ' .tool-versions | awk '{print $2}')"
+            echo "just=$(grep '^just ' .tool-versions | awk '{print $2}')"
+            echo "ansible-lint=$(grep '^ansible-lint ' .tool-versions | awk '{print $2}')"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Install just
         uses: extractions/setup-just@v4
