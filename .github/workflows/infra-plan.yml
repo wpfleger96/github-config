@@ -42,7 +42,7 @@ jobs:
 
       - name: Plan infra changes
         run: |
-          gh infra plan github/ 2>&1 | sed $'s/\x1b\]8;;[^\x07]*\x07//g' | tee /tmp/plan-output.txt
+          gh infra plan github/ --diff 2>&1 | sed $'s/\x1b\]8;;[^\x07]*\x07//g' | tee /tmp/plan-output.txt
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
           NO_COLOR: "1"
