@@ -19,24 +19,44 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Read tool versions
+        id: versions
+        run: |
+          {
+            echo "terraform=$(grep '^terraform ' .tool-versions | awk '{print $2}')"
+            echo "tflint=v$(grep '^tflint ' .tool-versions | awk '{print $2}')"
+            echo "shellcheck=v$(grep '^shellcheck ' .tool-versions | awk '{print $2}')"
+            echo "shfmt=$(grep '^shfmt ' .tool-versions | awk '{print $2}')"
+            echo "just=$(grep '^just ' .tool-versions | awk '{print $2}')"
+            echo "ansible-lint=$(grep '^ansible-lint ' .tool-versions | awk '{print $2}')"
+          } >> "$GITHUB_OUTPUT"
+
       - name: Install just
         uses: extractions/setup-just@v4
+        with:
+          just-version: ${{ steps.versions.outputs.just }}
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v4
         with:
+          terraform_version: ${{ steps.versions.outputs.terraform }}
           terraform_wrapper: false
 
       - name: Set up TFLint
         uses: terraform-linters/setup-tflint@v6
+        with:
+          tflint_version: ${{ steps.versions.outputs.tflint }}
 
       - name: Install shellcheck
-        run: sudo apt-get install -y shellcheck
+        run: |
+          VERSION=${{ steps.versions.outputs.shellcheck }}
+          curl -sSL "https://github.com/koalaman/shellcheck/releases/download/${VERSION}/shellcheck-${VERSION}.linux.x86_64.tar.xz" | tar xJ
+          sudo mv "shellcheck-${VERSION}/shellcheck" /usr/local/bin/
 
       - name: Install shfmt
-        run: |
-          curl -sS https://webi.sh/shfmt | sh
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+        uses: mfinelli/setup-shfmt@v3
+        with:
+          shfmt-version: ${{ steps.versions.outputs.shfmt }}
 
       - name: Install PowerShell
         run: |
@@ -45,10 +65,11 @@ jobs:
 
       - name: Install PSScriptAnalyzer
         shell: pwsh
-        run: Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser
+        # renovate: datasource=github-releases depName=PowerShell/PSScriptAnalyzer
+        run: Install-Module -Name PSScriptAnalyzer -RequiredVersion 1.25.0 -Force -Scope CurrentUser
 
       - name: Install ansible-lint
-        run: pip install ansible-lint
+        run: pip install ansible-lint==${{ steps.versions.outputs.ansible-lint }}
 
       - name: Initialize TFLint
         run: tflint --init --chdir=terraform
