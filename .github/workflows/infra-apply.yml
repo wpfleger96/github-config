@@ -48,3 +48,4 @@ jobs:
         run: gh infra apply github/ --auto-approve
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          GH_INFRA_OUTPUT: stream
