@@ -28,6 +28,7 @@ jobs:
         uses: astral-sh/setup-uv@v8.1.0
         with:
           version: "latest"
+          enable-cache: true
 
       - name: Install just
         uses: extractions/setup-just@v4
@@ -36,6 +37,8 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: "lts/*"
+          cache: "npm"
+          cache-dependency-path: ui/package-lock.json
 
       - name: Install dependencies
         run: just sync
