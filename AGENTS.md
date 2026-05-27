@@ -42,7 +42,7 @@ github/
                        # auto-approve.yml, publish.yml, release.yml, renovate.json
 renovate-config/
   default.json         # Shared Renovate preset extended by all managed repos
-.github/workflows/     # ci.yml, infra-plan.yml, infra-apply.yml, infra-drift.yml, renovate.yml
+.github/workflows/     # ci.yml, infra-plan.yml, infra-apply.yml, infra-drift.yml
 ```
 
 ## Key Patterns
@@ -78,6 +78,8 @@ renovate-config/
 6. **SC2129** — actionlint/shellcheck flags multiple `>> $GITHUB_OUTPUT` lines. Fix: `{ echo "k=v"; echo "k2=v2"; } >> "$GITHUB_OUTPUT"`.
 
 7. **`release.yml` excluded from actionlint** — stale `@v3` metadata triggers actionlint#648; CI explicitly skips it.
+
+8. **No `$comment` in `renovate.json`** — Renovate's config validator only whitelists `$schema` as an ignored key. Any other unrecognized field (including `$comment`) is rejected as an invalid config option. Use a YAML/JSON comment-less approach or put provenance in the managed-file header for non-JSON formats only.
 
 ## Key Files by Task
 
