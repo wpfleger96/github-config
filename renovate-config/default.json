@@ -18,7 +18,8 @@
   },
   "lockFileMaintenance": {
     "enabled": true,
-    "automerge": true
+    "automerge": true,
+    "schedule": ["at any time"]
   },
   "packageRules": [
     {
