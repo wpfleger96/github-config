@@ -56,7 +56,7 @@ jobs:
           sudo mv "shellcheck-${VERSION}/shellcheck" /usr/local/bin/
 
       - name: Install shfmt
-        uses: mfinelli/setup-shfmt@v3
+        uses: mfinelli/setup-shfmt@v4
         with:
           shfmt-version: ${{ steps.versions.outputs.shfmt }}
 
