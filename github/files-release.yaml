@@ -5,14 +5,32 @@ metadata:
 
 spec:
   repositories:
-    - ai-agent-rules
-    - claude-code-status-line
-    - pagerduty-mcp-server
-    - shell-configs
+    - name: ai-agent-rules
+      overrides:
+        - path: release-please-config.json
+          vars:
+            package_name: ai-agent-rules
+    - name: claude-code-status-line
+      overrides:
+        - path: release-please-config.json
+          vars:
+            package_name: claude-code-statusline
+    - name: pagerduty-mcp-server
+      overrides:
+        - path: release-please-config.json
+          vars:
+            package_name: pagerduty_mcp_server
+    - name: shell-configs
+      overrides:
+        - path: release-please-config.json
+          vars:
+            package_name: shell-configs
 
   files:
     - path: .github/workflows/release.yml
       source: ./templates/release.yml
+    - path: release-please-config.json
+      source: ./templates/release-please-config.json
 
   via: push
   commit_message: "ci: sync release workflow"
