@@ -27,18 +27,19 @@ gh infra apply github/ --force-secrets     # Re-apply secrets (values can't be d
 | recall | private | CI (CI+Deps+Justfile) | `vars: git_identity: "true"` on ci.yml |
 | SNORE | private | CI (CI+Deps+Justfile) | `source: ./templates/ci-snore.yml` |
 | homelabconfigs | private | CI-infra (CI+Deps) | `source: ./templates/ci-infra.yml`; no Justfile |
+| syncify | private | CI (CI+Deps) | `source: ./templates/ci-syncify.yml`; no Justfile |
 
 ## Project Structure
 
 ```
 github/
-  files-all.yaml       # ci.yml + renovate.json + auto-approve.yml → 8 repos
+  files-all.yaml       # ci.yml + renovate.json + auto-approve.yml → 9 repos
   files-full.yaml      # publish.yml → 3 PyPI repos
   files-justfile.yaml  # Justfile → 7 repos (homelabconfigs excluded)
   files-release.yaml   # release.yml → 4 release-tier repos
   repos-public.yaml    # RepositorySet: 4 public repos (with rulesets)
-  repos-private.yaml   # RepositorySet: 4 private repos (no rulesets — Free plan)
-  templates/           # ci-python.yml, ci-infra.yml, ci-snore.yml, Justfile,
+  repos-private.yaml   # RepositorySet: 5 private repos (no rulesets — Free plan)
+  templates/           # ci-python.yml, ci-infra.yml, ci-snore.yml, ci-syncify.yml, Justfile,
                        # auto-approve.yml, publish.yml, release.yml, renovate.json
 renovate-config/
   default.json         # Shared Renovate preset extended by all managed repos
