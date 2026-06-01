@@ -1,0 +1,28 @@
+apiVersion: gh-infra/v1
+kind: FileSet
+metadata:
+  owner: wpfleger96
+
+spec:
+  repositories:
+    - ai-agent-rules
+    - claude-code-status-line
+    - pagerduty-mcp-server
+    - JamBot
+    - name: recall
+      overrides:
+        - path: .github/workflows/ci.yml
+          vars:
+            git_identity: "true"
+    - name: shell-configs
+      overrides:
+        - path: .github/workflows/ci.yml
+          vars:
+            shell: "true"
+
+  files:
+    - path: .github/workflows/ci.yml
+      source: ./templates/ci-python.yml
+
+  via: push
+  commit_message: "ci: sync CI workflow"

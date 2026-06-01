@@ -25,22 +25,23 @@ gh infra apply github/ --force-secrets     # Re-apply secrets (values can't be d
 | github-config | public | Self (source only) | — |
 | shell-configs | private | Release (CI+Deps+Justfile+Release) | `vars: shell: "true"` on ci.yml + Justfile |
 | recall | private | CI (CI+Deps+Justfile) | `vars: git_identity: "true"` on ci.yml |
-| SNORE | private | CI (CI+Deps+Justfile) | `source: ./templates/ci-snore.yml` |
-| homelabconfigs | private | CI-infra (CI+Deps) | `source: ./templates/ci-infra.yml`; no Justfile |
-| syncify | private | CI (CI+Deps) | `source: ./templates/ci-syncify.yml`; no Justfile |
+| SNORE | private | Deps+Justfile (CI self-managed) | — |
+| homelabconfigs | private | Deps (CI self-managed; no Justfile) | — |
+| syncify | private | Deps (CI self-managed; no Justfile) | — |
 
 ## Project Structure
 
 ```
 github/
-  files-all.yaml       # ci.yml + renovate.json + auto-approve.yml → 9 repos
+  files-all.yaml       # renovate.json + auto-approve.yml → 9 repos
+  files-ci.yaml        # ci.yml → 6 repos (SNORE, homelabconfigs, syncify self-manage CI)
   files-full.yaml      # publish.yml → 3 PyPI repos
-  files-justfile.yaml  # Justfile → 7 repos (homelabconfigs excluded)
+  files-justfile.yaml  # Justfile → 7 repos (homelabconfigs, syncify excluded)
   files-release.yaml   # release.yml → 4 release-tier repos
   repos-public.yaml    # RepositorySet: 4 public repos (with rulesets)
   repos-private.yaml   # RepositorySet: 5 private repos (no rulesets — Free plan)
-  templates/           # ci-python.yml, ci-infra.yml, ci-snore.yml, ci-syncify.yml, Justfile,
-                       # auto-approve.yml, publish.yml, release.yml, renovate.json
+  templates/           # ci-python.yml, Justfile, auto-approve.yml, publish.yml,
+                       # release.yml, renovate.json
 renovate-config/
   default.json         # Shared Renovate preset extended by all managed repos
 .github/workflows/     # ci.yml, infra-plan.yml, infra-apply.yml, infra-drift.yml
@@ -63,6 +64,8 @@ renovate-config/
 ```yaml
 # This file is managed by github-config. Do not edit manually.
 ```
+
+**Self-managed CI** — repos with non-standard CI requirements (multi-component stacks, non-Python toolchains) own their `.github/workflows/ci.yml` directly. github-config manages only shared configs (`renovate.json`, `auto-approve.yml`) for these repos via `files-all.yaml`. Currently self-managed: SNORE (Python + Vue), syncify (Python + React + Docker), homelabconfigs (Terraform + Ansible).
 
 ## Common Gotchas
 
@@ -88,7 +91,7 @@ renovate-config/
 |------|---------|
 | Add repo to management | `github/repos-public.yaml` or `repos-private.yaml` + relevant `files-*.yaml` |
 | Distribute a new file | `github/templates/` + new or existing `files-*.yaml` |
-| Update CI template | `github/templates/ci-python.yml` (or `ci-infra.yml` / `ci-snore.yml`) |
+| Update CI template | `github/templates/ci-python.yml` |
 | Update shared Justfile | `github/templates/Justfile` |
 | Update Renovate preset | `renovate-config/default.json` |
 | Change branch protection | `github/repos-public.yaml` → rulesets section |
