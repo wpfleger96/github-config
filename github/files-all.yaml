@@ -9,32 +9,13 @@ spec:
     - claude-code-status-line
     - pagerduty-mcp-server
     - JamBot
-    - name: recall
-      overrides:
-        - path: .github/workflows/ci.yml
-          vars:
-            git_identity: "true"
-    - name: SNORE
-      overrides:
-        - path: .github/workflows/ci.yml
-          source: ./templates/ci-snore.yml
-    - name: shell-configs
-      overrides:
-        - path: .github/workflows/ci.yml
-          vars:
-            shell: "true"
-    - name: homelabconfigs
-      overrides:
-        - path: .github/workflows/ci.yml
-          source: ./templates/ci-infra.yml
-    - name: syncify
-      overrides:
-        - path: .github/workflows/ci.yml
-          source: ./templates/ci-syncify.yml
+    - recall
+    - SNORE
+    - shell-configs
+    - homelabconfigs
+    - syncify
 
   files:
-    - path: .github/workflows/ci.yml
-      source: ./templates/ci-python.yml
     - path: renovate.json
       source: ./templates/renovate.json
     - path: .github/workflows/auto-approve.yml
