@@ -27,6 +27,10 @@ spec:
       overrides:
         - path: .github/workflows/ci.yml
           source: ./templates/ci-infra.yml
+    - name: syncify
+      overrides:
+        - path: .github/workflows/ci.yml
+          source: ./templates/ci-syncify.yml
 
   files:
     - path: .github/workflows/ci.yml
