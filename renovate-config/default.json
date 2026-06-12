@@ -9,7 +9,7 @@
   "commitMessagePrefix": "chore(deps):",
   "platformAutomerge": true,
   "automergeType": "pr",
-  "schedule": ["* * * * 1,4"],
+  "schedule": ["* * * * 4"],
   "minimumReleaseAge": "1 week",
   "internalChecksFilter": "strict",
   "vulnerabilityAlerts": {
@@ -20,7 +20,7 @@
   "lockFileMaintenance": {
     "enabled": true,
     "automerge": true,
-    "schedule": ["* * * * 1,4"]
+    "schedule": ["* * * * 4"]
   },
   "packageRules": [
     {
