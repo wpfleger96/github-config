@@ -18,13 +18,13 @@ gh infra apply github/ --force-secrets     # Re-apply secrets (values can't be d
 
 | Repo | Visibility | Tier | FileSet overrides |
 |------|-----------|------|------------------|
-| ai-agent-rules | public | Full (CI+Deps+Release+Publish) | `vars: e2e: "true"` on ci.yml |
+| ai-agent-rules | public | Full (CI+Deps+Release+Publish) | — |
 | claude-code-status-line | public | Full (CI+Deps+Release+Publish) | — |
 | pagerduty-mcp-server | public | Full (CI+Deps+Release+Publish) | — |
 | JamBot | public | CI (CI+Deps+Justfile) | — |
 | github-config | public | Self (source only) | — |
 | SNORE | public | Deps+Justfile (CI self-managed) | — |
-| shell-configs | private | Release (CI+Deps+Justfile+Release) | `vars: shell: "true"` on ci.yml + Justfile; `vars: e2e: "true"` on ci.yml |
+| shell-configs | private | Release (CI+Deps+Justfile+Release) | `vars: shell: "true"` on ci.yml + Justfile |
 | recall | private | CI (CI+Deps+Justfile) | `vars: git_identity: "true"` on ci.yml |
 | homelabconfigs | private | Deps (CI self-managed; no Justfile) | — |
 | syncify | private | Deps (CI self-managed; no Justfile) | — |
@@ -67,7 +67,7 @@ renovate-config/
 
 **Self-managed CI** — repos with non-standard CI requirements (multi-component stacks, non-Python toolchains) own their `.github/workflows/ci.yml` directly. github-config manages only shared configs (`renovate.json`, `auto-approve.yml`) for these repos via `files-all.yaml`. Currently self-managed: SNORE (Python + Vue), syncify (Python + React + Docker), homelabconfigs (Terraform + Ansible).
 
-**E2E testing** — the standard is: e2e tests carry the `e2e` pytest marker; the managed `Justfile` keeps them out of the fast run (`test: uv run pytest -m "not e2e"`) and runs them separately (`test-e2e: uv run pytest -m e2e --no-cov`; `test-all` runs everything). A repo opts its templated CI into a **dedicated gating `e2e` job** with `vars: e2e: "true"` on its `ci.yml` entry in `files-ci.yaml`; the `ci-python.yml` template guards the job behind `<%- if (index .Vars "e2e") %>`. For public repos, add the `e2e` context to the required status checks via a per-repo `rulesets` override in `repos-public.yaml` (the shared default ruleset only requires `checks`). Self-managed-CI repos wire the `e2e` job in their own `ci.yml`. Before enabling `vars: e2e`, confirm the repo's e2e tests are actually collected by `just test-e2e` (e.g. no leftover `--ignore=tests/e2e` in `addopts`), or the job collects 0 tests and fails.
+**E2E testing** — every managed-CI repo gets a dedicated gating `e2e` job (unconditional in `ci-python.yml`). The `e2e` context is required by the default `main` ruleset alongside `checks`. The managed `Justfile` keeps e2e out of the fast run (`test: uv run pytest -m "not e2e"`) and runs them separately (`test-e2e`; `test-all` runs everything). Repos without e2e-marked tests pass trivially (the recipe tolerates pytest exit code 5 = no tests collected). To add e2e tests to a repo: create `tests/e2e/`, mark tests with `@pytest.mark.e2e`, register the marker in pyproject, and use `-m 'not e2e'` (not `--ignore`) in `addopts`. Self-managed-CI repos wire the `e2e` job in their own `ci.yml`.
 
 ## Common Gotchas
 

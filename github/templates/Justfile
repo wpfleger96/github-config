@@ -95,7 +95,7 @@ test-integration:
     uv run pytest -m integration
 
 test-e2e:
-    uv run pytest -m e2e --no-cov
+    uv run pytest -m e2e --no-cov || test $? -eq 5
 
 # Everything, including the e2e suite.
 test-all:

@@ -80,7 +80,6 @@ jobs:
 
       - name: Run tests
         run: just test
-  <%- if (index .Vars "e2e") %>
 
   e2e:
     runs-on: ubuntu-latest
@@ -108,4 +107,3 @@ jobs:
 
       - name: Run end-to-end tests
         run: just test-e2e
-  <%- end %>

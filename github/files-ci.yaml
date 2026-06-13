@@ -5,11 +5,7 @@ metadata:
 
 spec:
   repositories:
-    - name: ai-agent-rules
-      overrides:
-        - path: .github/workflows/ci.yml
-          vars:
-            e2e: "true"
+    - ai-agent-rules
     - claude-code-status-line
     - pagerduty-mcp-server
     - JamBot
@@ -23,7 +19,6 @@ spec:
         - path: .github/workflows/ci.yml
           vars:
             shell: "true"
-            e2e: "true"
 
   files:
     - path: .github/workflows/ci.yml
