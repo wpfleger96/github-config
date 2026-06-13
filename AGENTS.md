@@ -18,14 +18,14 @@ gh infra apply github/ --force-secrets     # Re-apply secrets (values can't be d
 
 | Repo | Visibility | Tier | FileSet overrides |
 |------|-----------|------|------------------|
-| ai-agent-rules | public | Full (CI+Deps+Release+Publish) | — |
+| ai-agent-rules | public | Full (CI+Deps+Release+Publish) | `vars: e2e: "true"` on ci.yml |
 | claude-code-status-line | public | Full (CI+Deps+Release+Publish) | — |
 | pagerduty-mcp-server | public | Full (CI+Deps+Release+Publish) | — |
 | JamBot | public | CI (CI+Deps+Justfile) | — |
 | github-config | public | Self (source only) | — |
-| shell-configs | private | Release (CI+Deps+Justfile+Release) | `vars: shell: "true"` on ci.yml + Justfile |
+| SNORE | public | Deps+Justfile (CI self-managed) | — |
+| shell-configs | private | Release (CI+Deps+Justfile+Release) | `vars: shell: "true"` on ci.yml + Justfile; `vars: e2e: "true"` on ci.yml |
 | recall | private | CI (CI+Deps+Justfile) | `vars: git_identity: "true"` on ci.yml |
-| SNORE | private | Deps+Justfile (CI self-managed) | — |
 | homelabconfigs | private | Deps (CI self-managed; no Justfile) | — |
 | syncify | private | Deps (CI self-managed; no Justfile) | — |
 
@@ -38,8 +38,8 @@ github/
   files-full.yaml      # publish.yml → 3 PyPI repos
   files-justfile.yaml  # Justfile → 7 repos (homelabconfigs, syncify excluded)
   files-release.yaml   # release.yml → 4 release-tier repos
-  repos-public.yaml    # RepositorySet: 4 public repos (with rulesets)
-  repos-private.yaml   # RepositorySet: 5 private repos (no rulesets — Free plan)
+  repos-public.yaml    # RepositorySet: 6 public repos (with rulesets)
+  repos-private.yaml   # RepositorySet: 4 private repos (no rulesets — Free plan)
   templates/           # ci-python.yml, Justfile, auto-approve.yml, publish.yml,
                        # release.yml, renovate.json
 renovate-config/

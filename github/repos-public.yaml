@@ -86,6 +86,38 @@ repositories:
     - llm
     - claude-code
     - coding-agents
+    rulesets:
+    - name: main
+      target: branch
+      enforcement: active
+      bypass_actors:
+      - role: admin
+        bypass_mode: always
+      - app: id:3648544
+        bypass_mode: always
+      conditions:
+        ref_name:
+          include:
+          - ~DEFAULT_BRANCH
+      rules:
+        pull_request:
+          required_approving_review_count: 1
+          dismiss_stale_reviews_on_push: true
+          require_code_owner_review: false
+          require_last_push_approval: true
+          required_review_thread_resolution: true
+        required_status_checks:
+          strict_required_status_checks_policy: true
+          contexts:
+          - context: checks
+            app: github-actions
+          - context: e2e
+            app: github-actions
+        non_fast_forward: true
+        deletion: true
+        creation: false
+        required_linear_history: false
+        required_signatures: false
 - name: claude-code-status-line
   spec:
     description: "Real-time status bar for Claude Code showing model, context usage, session cost, git state, and token counts via the native status line hook"
