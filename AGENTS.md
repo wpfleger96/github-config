@@ -67,6 +67,8 @@ renovate-config/
 
 **Self-managed CI** — repos with non-standard CI requirements (multi-component stacks, non-Python toolchains) own their `.github/workflows/ci.yml` directly. github-config manages only shared configs (`renovate.json`, `auto-approve.yml`) for these repos via `files-all.yaml`. Currently self-managed: SNORE (Python + Vue), syncify (Python + React + Docker), homelabconfigs (Terraform + Ansible).
 
+**E2E testing** — the standard is: e2e tests carry the `e2e` pytest marker; the managed `Justfile` keeps them out of the fast run (`test: uv run pytest -m "not e2e"`) and runs them separately (`test-e2e: uv run pytest -m e2e --no-cov`; `test-all` runs everything). A repo opts its templated CI into a **dedicated gating `e2e` job** with `vars: e2e: "true"` on its `ci.yml` entry in `files-ci.yaml`; the `ci-python.yml` template guards the job behind `<%- if (index .Vars "e2e") %>`. For public repos, add the `e2e` context to the required status checks via a per-repo `rulesets` override in `repos-public.yaml` (the shared default ruleset only requires `checks`). Self-managed-CI repos wire the `e2e` job in their own `ci.yml`. Before enabling `vars: e2e`, confirm the repo's e2e tests are actually collected by `just test-e2e` (e.g. no leftover `--ignore=tests/e2e` in `addopts`), or the job collects 0 tests and fails.
+
 ## Common Gotchas
 
 1. **`ci-python.yml` excluded from actionlint** — `<% %>` directives are not valid YAML; CI explicitly skips it. Don't "fix" the syntax errors — they're intentional template directives.
