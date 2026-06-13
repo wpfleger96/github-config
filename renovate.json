@@ -2,6 +2,8 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["github>wpfleger96/github-config//renovate-config/default"],
   "github-actions": {
-    "fileMatch": ["github/templates/.+\\.ya?ml$"]
+    "managerFilePatterns": [
+      "/github/templates/.+\\.ya?ml$/"
+    ]
   }
 }
