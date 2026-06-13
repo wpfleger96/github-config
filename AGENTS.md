@@ -23,9 +23,9 @@ gh infra apply github/ --force-secrets     # Re-apply secrets (values can't be d
 | pagerduty-mcp-server | public | Full (CI+Deps+Release+Publish) | — |
 | JamBot | public | CI (CI+Deps+Justfile) | — |
 | github-config | public | Self (source only) | — |
+| SNORE | public | Deps+Justfile (CI self-managed) | — |
 | shell-configs | private | Release (CI+Deps+Justfile+Release) | `vars: shell: "true"` on ci.yml + Justfile |
 | recall | private | CI (CI+Deps+Justfile) | `vars: git_identity: "true"` on ci.yml |
-| SNORE | private | Deps+Justfile (CI self-managed) | — |
 | homelabconfigs | private | Deps (CI self-managed; no Justfile) | — |
 | syncify | private | Deps (CI self-managed; no Justfile) | — |
 
@@ -38,8 +38,8 @@ github/
   files-full.yaml      # publish.yml → 3 PyPI repos
   files-justfile.yaml  # Justfile → 7 repos (homelabconfigs, syncify excluded)
   files-release.yaml   # release.yml → 4 release-tier repos
-  repos-public.yaml    # RepositorySet: 4 public repos (with rulesets)
-  repos-private.yaml   # RepositorySet: 5 private repos (no rulesets — Free plan)
+  repos-public.yaml    # RepositorySet: 6 public repos (with rulesets)
+  repos-private.yaml   # RepositorySet: 4 private repos (no rulesets — Free plan)
   templates/           # ci-python.yml, Justfile, auto-approve.yml, publish.yml,
                        # release.yml, renovate.json
 renovate-config/
@@ -66,6 +66,8 @@ renovate-config/
 ```
 
 **Self-managed CI** — repos with non-standard CI requirements (multi-component stacks, non-Python toolchains) own their `.github/workflows/ci.yml` directly. github-config manages only shared configs (`renovate.json`, `auto-approve.yml`) for these repos via `files-all.yaml`. Currently self-managed: SNORE (Python + Vue), syncify (Python + React + Docker), homelabconfigs (Terraform + Ansible).
+
+**E2E testing** — every managed-CI repo gets a dedicated gating `e2e` job (unconditional in `ci-python.yml`). The `e2e` context is required by the default `main` ruleset alongside `checks`. The managed `Justfile` keeps e2e out of the fast run (`test: uv run pytest -m "not e2e"`) and runs them separately (`test-e2e`; `test-all` runs everything). Repos without e2e-marked tests pass trivially (the recipe tolerates pytest exit code 5 = no tests collected). To add e2e tests to a repo: create `tests/e2e/`, mark tests with `@pytest.mark.e2e`, register the marker in pyproject, and use `-m 'not e2e'` (not `--ignore`) in `addopts`. Self-managed-CI repos wire the `e2e` job in their own `ci.yml`.
 
 ## Common Gotchas
 
