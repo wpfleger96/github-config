@@ -112,6 +112,39 @@ repositories:
     - gitops
     - renovate
     - gh-infra
+    # github-config self-manages its CI (Go-based gh-infra validate/plan). It
+    # only emits a `checks` job — override the default ruleset to drop the `e2e`
+    # context that github-config's CI never reports.
+    rulesets:
+    - name: main
+      target: branch
+      enforcement: active
+      bypass_actors:
+      - role: admin
+        bypass_mode: always
+      - app: id:3648544
+        bypass_mode: always
+      conditions:
+        ref_name:
+          include:
+          - ~DEFAULT_BRANCH
+      rules:
+        pull_request:
+          required_approving_review_count: 1
+          dismiss_stale_reviews_on_push: true
+          require_code_owner_review: false
+          require_last_push_approval: true
+          required_review_thread_resolution: true
+        required_status_checks:
+          strict_required_status_checks_policy: true
+          contexts:
+          - context: checks
+            app: github-actions
+        non_fast_forward: true
+        deletion: true
+        creation: false
+        required_linear_history: false
+        required_signatures: false
 - name: SNORE
   spec:
     description: "Parses ResMed CPAP binary data, scores respiratory events against AASM clinical standards, and serves results via CLI, REST API, and Vue web UI"
