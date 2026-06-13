@@ -22,7 +22,7 @@ gh infra apply github/ --force-secrets     # Re-apply secrets (values can't be d
 | claude-code-status-line | public | Full (CI+Deps+Release+Publish) | — |
 | pagerduty-mcp-server | public | Full (CI+Deps+Release+Publish) | — |
 | JamBot | public | CI (CI+Deps+Justfile) | — |
-| github-config | public | Self (source only) | — |
+| github-config | public | Self (CI self-managed; source only) | — |
 | SNORE | public | Deps+Justfile (CI self-managed) | — |
 | shell-configs | private | Release (CI+Deps+Justfile+Release) | `vars: shell: "true"` on ci.yml + Justfile |
 | recall | private | CI (CI+Deps+Justfile) | `vars: git_identity: "true"` on ci.yml |
@@ -34,7 +34,7 @@ gh infra apply github/ --force-secrets     # Re-apply secrets (values can't be d
 ```
 github/
   files-all.yaml       # renovate.json + auto-approve.yml → 9 repos
-  files-ci.yaml        # ci.yml → 6 repos (SNORE, homelabconfigs, syncify self-manage CI)
+  files-ci.yaml        # ci.yml → 6 repos (github-config, SNORE, homelabconfigs, syncify self-manage CI)
   files-full.yaml      # publish.yml → 3 PyPI repos
   files-justfile.yaml  # Justfile → 7 repos (homelabconfigs, syncify excluded)
   files-release.yaml   # release.yml → 4 release-tier repos
@@ -65,7 +65,7 @@ renovate-config/
 # This file is managed by github-config. Do not edit manually.
 ```
 
-**Self-managed CI** — repos with non-standard CI requirements (multi-component stacks, non-Python toolchains) own their `.github/workflows/ci.yml` directly. github-config manages only shared configs (`renovate.json`, `auto-approve.yml`) for these repos via `files-all.yaml`. Currently self-managed: SNORE (Python + Vue), syncify (Python + React + Docker), homelabconfigs (Terraform + Ansible).
+**Self-managed CI** — repos with non-standard CI requirements (multi-component stacks, non-Python toolchains) own their `.github/workflows/ci.yml` directly. github-config manages only shared configs (`renovate.json`, `auto-approve.yml`) for these repos via `files-all.yaml`. Currently self-managed: github-config (Go-based gh-infra), SNORE (Python + Vue), syncify (Python + React + Docker), homelabconfigs (Terraform + Ansible). **Public self-managed repos need a per-repo `rulesets` override in `repos-public.yaml`** to match the contexts their CI actually emits — the default ruleset requires `checks` + `e2e`, which only `ci-python.yml` repos satisfy.
 
 **E2E testing** — every managed-CI repo gets a dedicated gating `e2e` job (unconditional in `ci-python.yml`). The `e2e` context is required by the default `main` ruleset alongside `checks`. The managed `Justfile` keeps e2e out of the fast run (`test: uv run pytest -m "not e2e"`) and runs them separately (`test-e2e`; `test-all` runs everything). Repos without e2e-marked tests pass trivially (the recipe tolerates pytest exit code 5 = no tests collected). To add e2e tests to a repo: create `tests/e2e/`, mark tests with `@pytest.mark.e2e`, register the marker in pyproject, and use `-m 'not e2e'` (not `--ignore`) in `addopts`. Self-managed-CI repos wire the `e2e` job in their own `ci.yml`.
 
