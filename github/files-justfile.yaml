@@ -16,6 +16,7 @@ spec:
         - path: Justfile
           vars:
             shell: "true"
+    - meowdb
 
   files:
     - path: Justfile

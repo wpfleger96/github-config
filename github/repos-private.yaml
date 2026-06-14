@@ -79,3 +79,7 @@ repositories:
     - music
     - self-hosted
     - docker
+- name: meowdb
+  spec:
+    topics:
+    - python
