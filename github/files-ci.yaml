@@ -19,7 +19,6 @@ spec:
         - path: .github/workflows/ci.yml
           vars:
             shell: "true"
-    - meowdb
 
   files:
     - path: .github/workflows/ci.yml
