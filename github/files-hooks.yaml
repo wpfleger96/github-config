@@ -1,0 +1,23 @@
+apiVersion: gh-infra/v1
+kind: FileSet
+metadata:
+  owner: wpfleger96
+
+spec:
+  repositories:
+    - ai-agent-rules
+    - claude-code-status-line
+    - pagerduty-mcp-server
+    - JamBot
+    - recall
+    - SNORE
+    - shell-configs
+    - meowdb
+
+  files:
+    - path: .hooks/pre-commit
+      source: ./templates/pre-commit-hook
+      executable: true
+
+  via: push
+  commit_message: "chore: sync pre-commit hook"
