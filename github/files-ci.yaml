@@ -9,6 +9,7 @@ spec:
     - claude-code-status-line
     - pagerduty-mcp-server
     - JamBot
+    - meowdb
     - name: recall
       overrides:
         - path: .github/workflows/ci.yml
