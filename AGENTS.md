@@ -27,6 +27,7 @@ gh infra apply github/ --force-secrets     # Re-apply secrets (values can't be d
 | shell-configs | private | Release (CI+Deps+Justfile+Release) | `vars: shell: "true"` on ci.yml + Justfile |
 | recall | private | CI (CI+Deps+Justfile) | `vars: git_identity: "true"` on ci.yml |
 | homelabconfigs | private | Deps (CI self-managed; no Justfile) | — |
+| meowdb | public | CI+Deps+Justfile+Hooks | — |
 | syncify | private | Deps (CI self-managed; no Justfile) | — |
 
 ## Project Structure
