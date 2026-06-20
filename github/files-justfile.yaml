@@ -17,6 +17,7 @@ spec:
           vars:
             shell: "true"
     - meowdb
+    - envsync
 
   files:
     - path: Justfile

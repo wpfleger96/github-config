@@ -13,6 +13,7 @@ spec:
     - SNORE
     - shell-configs
     - meowdb
+    - envsync
 
   files:
     - path: .hooks/pre-commit

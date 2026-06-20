@@ -79,3 +79,11 @@ repositories:
     - music
     - self-hosted
     - docker
+- name: envsync
+  spec:
+    description: "Load secrets from Enpass password manager into environment variables"
+    topics:
+    - python
+    - enpass
+    - secrets
+    - cli
