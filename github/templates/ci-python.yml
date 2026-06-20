@@ -50,6 +50,13 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
       <%- end %>
+      <%- if (index .Vars "system_packages") %>
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y <% index .Vars "system_packages" %>
+      <%- end %>
 
       - name: Install dependencies
         run: just sync
@@ -101,6 +108,13 @@ jobs:
 
       - name: Install just
         uses: extractions/setup-just@v4
+      <%- if (index .Vars "system_packages") %>
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y <% index .Vars "system_packages" %>
+      <%- end %>
 
       - name: Install dependencies
         run: just sync

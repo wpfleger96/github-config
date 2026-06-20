@@ -10,7 +10,11 @@ spec:
     - pagerduty-mcp-server
     - JamBot
     - meowdb
-    - envsync
+    - name: envsync
+      overrides:
+        - path: .github/workflows/ci.yml
+          vars:
+            system_packages: "libsqlcipher-dev"
     - name: recall
       overrides:
         - path: .github/workflows/ci.yml
