@@ -15,6 +15,7 @@ spec:
     - homelabconfigs
     - syncify
     - meowdb
+    - envsync
 
   files:
     - path: renovate.json
