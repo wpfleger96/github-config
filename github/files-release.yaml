@@ -25,6 +25,11 @@ spec:
         - path: release-please-config.json
           vars:
             package_name: shell-configs
+    - name: meowdb
+      overrides:
+        - path: release-please-config.json
+          vars:
+            package_name: meowdb
 
   files:
     - path: .github/workflows/release.yml
