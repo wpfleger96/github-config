@@ -13,7 +13,7 @@ jobs:
   checks:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Clone gh-infra
         run: git clone --depth 1 -b dev https://github.com/wpfleger96/gh-infra.git /tmp/gh-infra
