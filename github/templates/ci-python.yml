@@ -43,13 +43,6 @@ jobs:
       - name: Install shfmt
         uses: mfinelli/setup-shfmt@v4
       <%- end %>
-      <%- if (index .Vars "git_identity") %>
-
-      - name: Configure git identity
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-      <%- end %>
       <%- if (index .Vars "system_packages") %>
 
       - name: Install system dependencies
@@ -98,13 +91,6 @@ jobs:
       - name: Install shfmt
         uses: mfinelli/setup-shfmt@v4
       <%- end %>
-      <%- if (index .Vars "git_identity") %>
-
-      - name: Configure git identity
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-      <%- end %>
       <%- if (index .Vars "system_packages") %>
 
       - name: Install system dependencies
@@ -148,13 +134,6 @@ jobs:
 
       - name: Install just
         uses: extractions/setup-just@v4
-      <%- if (index .Vars "git_identity") %>
-
-      - name: Configure git identity
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-      <%- end %>
       <%- if (index .Vars "system_packages") %>
 
       - name: Install system dependencies
