@@ -29,18 +29,19 @@ gh infra apply github/ --force-secrets     # Re-apply secrets (values can't be d
 | homelabconfigs | private | Deps (CI self-managed; no Justfile) | — |
 | meowdb | public | CI+Deps+Justfile+Hooks+Release | — |
 | syncify | private | Deps (CI self-managed; no Justfile) | — |
+| BOOTLEG | private | CI (CI+Deps+Justfile+Hooks) | — |
 
 ## Project Structure
 
 ```
 github/
-  files-all.yaml       # renovate.json + auto-approve.yml → 9 repos
-  files-ci.yaml        # ci.yml → 6 repos (github-config, SNORE, homelabconfigs, syncify self-manage CI)
+  files-all.yaml       # renovate.json + auto-approve.yml → 12 repos
+  files-ci.yaml        # ci.yml → 9 repos (github-config, SNORE, homelabconfigs, syncify self-manage CI)
   files-full.yaml      # publish.yml → 3 PyPI repos
-  files-justfile.yaml  # Justfile → 7 repos (homelabconfigs, syncify excluded)
+  files-justfile.yaml  # Justfile → 10 repos (homelabconfigs, syncify excluded)
   files-release.yaml   # release.yml → 5 release-tier repos
-  repos-public.yaml    # RepositorySet: 6 public repos (with rulesets)
-  repos-private.yaml   # RepositorySet: 4 private repos (no rulesets — Free plan)
+  repos-public.yaml    # RepositorySet: 7 public repos (with rulesets)
+  repos-private.yaml   # RepositorySet: 6 private repos (no rulesets — Free plan)
   templates/           # ci-python.yml, Justfile, auto-approve.yml, publish.yml,
                        # release.yml, renovate.json
 renovate-config/
