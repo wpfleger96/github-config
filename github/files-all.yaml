@@ -16,6 +16,7 @@ spec:
     - syncify
     - meowdb
     - envsync
+    - BOOTLEG
 
   files:
     - path: renovate.json
