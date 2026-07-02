@@ -18,8 +18,28 @@ permissions:
   contents: read
 
 jobs:
-  lint:
+  check:
+    name: ${{ matrix.name }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+<%- if (index .Vars "shell") %>
+          - name: lint
+            recipe: lint-python-check lint-shell-check
+          - name: format
+            recipe: format-python-check format-shell-check
+<%- else %>
+          - name: lint
+            recipe: lint-check
+          - name: format
+            recipe: format-check
+<%- end %>
+          - name: type-check
+            recipe: type-check
+          - name: test
+            recipe: test
 
     steps:
       - name: Checkout
@@ -42,6 +62,7 @@ jobs:
 
       - name: Install shfmt
         uses: mfinelli/setup-shfmt@v4
+        if: contains(matrix.recipe, 'shell')
       <%- end %>
       <%- if (index .Vars "system_packages") %>
 
@@ -50,157 +71,30 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y <% index .Vars "system_packages" %>
       <%- end %>
-
-      - name: Install dependencies
-        run: just sync
-      <%- if (index .Vars "shell") %>
-
-      - name: Run Python linter
-        run: just lint-python-check
-
-      - name: Run shell linter
-        run: just lint-shell-check
-      <%- else %>
-
-      - name: Run linter
-        run: just lint-check
-      <%- end %>
-
-  format:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version-file: .python-version
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v8.2.0
-        with:
-          version: "latest"
-          enable-cache: true
-
-      - name: Install just
-        uses: extractions/setup-just@v4
-      <%- if (index .Vars "shell") %>
-
-      - name: Install shfmt
-        uses: mfinelli/setup-shfmt@v4
-      <%- end %>
-      <%- if (index .Vars "system_packages") %>
-
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y <% index .Vars "system_packages" %>
-      <%- end %>
-
-      - name: Install dependencies
-        run: just sync
-      <%- if (index .Vars "shell") %>
-
-      - name: Run Python formatter
-        run: just format-python-check
-
-      - name: Run shell formatter
-        run: just format-shell-check
-      <%- else %>
-
-      - name: Run formatter
-        run: just format-check
-      <%- end %>
-
-  type-check:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version-file: .python-version
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v8.2.0
-        with:
-          version: "latest"
-          enable-cache: true
-
-      - name: Install just
-        uses: extractions/setup-just@v4
-      <%- if (index .Vars "system_packages") %>
-
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y <% index .Vars "system_packages" %>
-      <%- end %>
-
-      - name: Install dependencies
-        run: just sync
-
-      - name: Run type checks
-        run: just type-check
-
-  test:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version-file: .python-version
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v8.2.0
-        with:
-          version: "latest"
-          enable-cache: true
-
-      - name: Install just
-        uses: extractions/setup-just@v4
       <%- if (index .Vars "git_identity") %>
 
       - name: Configure git identity
+        if: matrix.name == 'test'
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
       <%- end %>
-      <%- if (index .Vars "system_packages") %>
-
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y <% index .Vars "system_packages" %>
-      <%- end %>
 
       - name: Install dependencies
         run: just sync
 
-      - name: Run tests
-        run: just test
+      - name: Run ${{ matrix.name }}
+        run: just ${{ matrix.recipe }}
 
   checks:
     if: always()
-    needs: [lint, format, type-check, test]
+    needs: [check]
     runs-on: ubuntu-latest
 
     steps:
       - name: Verify all checks passed
         run: |
-          if [[ "${{ needs.lint.result }}" != "success" || \
-                "${{ needs.format.result }}" != "success" || \
-                "${{ needs['type-check'].result }}" != "success" || \
-                "${{ needs.test.result }}" != "success" ]]; then
+          if [[ "${{ needs.check.result }}" != "success" ]]; then
             echo "One or more checks failed"
             exit 1
           fi
