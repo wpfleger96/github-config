@@ -15,6 +15,7 @@ spec:
     - meowdb
     - envsync
     - BOOTLEG
+    - syncify
 
   files:
     - path: .hooks/pre-commit

@@ -31,6 +31,19 @@ spec:
           vars:
             shell: "true"
             e2e: "true"
+    - name: SNORE
+      overrides:
+        - path: .github/workflows/ci.yml
+          vars:
+            web: "ui"
+            web_pm: "pnpm"
+            e2e: "true"
+    - name: syncify
+      overrides:
+        - path: .github/workflows/ci.yml
+          vars:
+            web: "ui/web"
+            web_pm: "npm"
 
   files:
     - path: .github/workflows/ci.yml

@@ -40,6 +40,10 @@ jobs:
             recipe: type-check
           - name: test
             recipe: test
+<%- if (index .Vars "web") %>
+          - name: web
+            recipe: web-install web-check
+<%- end %>
 
     steps:
       - name: Checkout
@@ -58,6 +62,24 @@ jobs:
 
       - name: Install just
         uses: extractions/setup-just@v4
+      <%- if (index .Vars "web") %>
+      <%- if eq (index .Vars "web_pm") "pnpm" %>
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+        if: matrix.name == 'web'
+        with:
+          package_json_file: <% index .Vars "web" %>/package.json
+      <%- end %>
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        if: matrix.name == 'web'
+        with:
+          node-version-file: <% index .Vars "web" %>/.node-version
+          cache: <% index .Vars "web_pm" %>
+          cache-dependency-path: <% index .Vars "web" %>/<% if eq (index .Vars "web_pm") "pnpm" %>pnpm-lock.yaml<% else %>package-lock.json<% end %>
+      <%- end %>
       <%- if (index .Vars "shell") %>
 
       - name: Install shfmt
@@ -81,6 +103,9 @@ jobs:
       <%- end %>
 
       - name: Install dependencies
+<%- if (index .Vars "web") %>
+        if: matrix.name != 'web'
+<%- end %>
         run: just sync
 
       - name: Run ${{ matrix.name }}
