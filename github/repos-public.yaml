@@ -184,11 +184,9 @@ repositories:
     - python
     - sleep
     - cpap
-    # SNORE self-manages its CI (Python + Vue): the single `checks` job is split
-    # into `backend` + `ui`, plus a dedicated `e2e` job. Override the default
-    # ruleset's required status checks to match the contexts SNORE emits, since
-    # the shared default requires a single `checks` context that SNORE no longer
-    # reports.
+    # SNORE uses the managed ci-python.yml (web matrix leg for the Vue UI) and
+    # opts into the e2e CI job, so require the e2e context in addition to the
+    # default checks context.
     rulesets:
     - name: main
       target: branch
@@ -212,9 +210,7 @@ repositories:
         required_status_checks:
           strict_required_status_checks_policy: true
           contexts:
-          - context: backend
-            app: github-actions
-          - context: ui
+          - context: checks
             app: github-actions
           - context: e2e
             app: github-actions

@@ -143,6 +143,41 @@ clean-build:
 
 # Clean and rebuild the package
 rebuild: clean-build build
+<%- if (index .Vars "web") %>
+
+# Web UI
+
+# Install web UI dependencies
+web-install:
+    cd <% index .Vars "web" %> && <% index .Vars "web_pm" %> install
+
+# Run web UI type checks
+web-type-check:
+    cd <% index .Vars "web" %> && <% index .Vars "web_pm" %> run type-check
+
+# Run web UI linter in check mode (no fixes)
+web-lint-check:
+    cd <% index .Vars "web" %> && <% index .Vars "web_pm" %> run lint-check
+
+# Run web UI formatter in check mode (no changes)
+web-format-check:
+    cd <% index .Vars "web" %> && <% index .Vars "web_pm" %> run format-check
+
+# Run web UI linter and auto-fix issues
+web-lint:
+    cd <% index .Vars "web" %> && <% index .Vars "web_pm" %> run lint
+
+# Run web UI formatter and auto-fix style
+web-format:
+    cd <% index .Vars "web" %> && <% index .Vars "web_pm" %> run format
+
+# Build the web UI
+web-build:
+    cd <% index .Vars "web" %> && <% index .Vars "web_pm" %> run build
+
+# Run all web UI quality checks
+web-check: web-type-check web-lint-check web-format-check
+<%- end %>
 <%- if (index .Vars "shell") %>
 
 # Run the full CI pipeline locally

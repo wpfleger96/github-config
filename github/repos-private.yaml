@@ -89,6 +89,8 @@ repositories:
     - cli
 - name: BOOTLEG
   spec:
+    description: "Multi-platform fantasy football aggregator — FastAPI REST API and MCP server"
     topics:
     - python
     - fastapi
+    - mcp

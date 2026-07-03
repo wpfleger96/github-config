@@ -10,7 +10,12 @@ spec:
     - pagerduty-mcp-server
     - JamBot
     - recall
-    - SNORE
+    - name: SNORE
+      overrides:
+        - path: Justfile
+          vars:
+            web: "ui"
+            web_pm: "pnpm"
     - name: shell-configs
       overrides:
         - path: Justfile
