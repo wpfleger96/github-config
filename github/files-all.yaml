@@ -17,6 +17,7 @@ spec:
     - meowdb
     - envsync
     - BOOTLEG
+    - health-records-engine
 
   files:
     - path: renovate.json
