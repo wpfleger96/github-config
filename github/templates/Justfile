@@ -72,7 +72,7 @@ check-all: check test<% if (index .Vars "web") %> web-install web-check<% end %>
     @echo "All quality checks and tests passed"
 
 # Sync, type-check, auto-fix lint/format, and run tests
-pre-commit: sync type-check lint-python lint-shell-check format-python format-shell test
+pre-commit: sync type-check lint-python lint-shell-check format-python format-shell test<% if (index .Vars "web") %> web-install web-type-check web-lint web-format<% end %>
     @echo "Pre-commit checks passed"
 <%- else %>
 
@@ -105,7 +105,7 @@ check-all: check test<% if (index .Vars "web") %> web-install web-check<% end %>
     @echo "All quality checks and tests passed"
 
 # Sync, type-check, auto-fix lint/format, and run tests
-pre-commit: sync type-check lint format test
+pre-commit: sync type-check lint format test<% if (index .Vars "web") %> web-install web-type-check web-lint web-format<% end %>
     @echo "Pre-commit checks passed"
 <%- end %>
 
