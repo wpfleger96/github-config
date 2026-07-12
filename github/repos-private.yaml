@@ -37,24 +37,6 @@ defaults:
       can_approve_pull_requests: true
 
 repositories:
-- name: shell-configs
-  spec:
-    description: "Declarative dev environment manager — shell configs, packages, VS Code/Cursor settings and extensions, git, GPG signing, gh CLI extensions, and iTerm2 profiles"
-    topics:
-    - python
-    - dotfiles
-    - shell
-    - cli
-    actions:
-      workflow_permissions: write
-    variables:
-    - name: RELEASE_APP_ID
-      value: "3648544"
-    - name: RELEASE_APP_CLIENT_ID
-      value: "Iv23lidipoTqvoMln1Di"
-    secrets:
-    - name: RELEASE_APP_PRIVATE_KEY
-      value: "${RELEASE_APP_PRIVATE_KEY}"
 - name: recall
   spec:
     description: "Recall is a GitHub-backed markdown wiki exposed to agents via MCP server"
