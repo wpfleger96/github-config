@@ -14,16 +14,22 @@ spec:
     - pagerduty-mcp-server
     - JamBot
     - meowdb
-    - BOOTLEG
+    - name: BOOTLEG
+      overrides:
+        - path: .github/workflows/ci.yml
+          vars:
+            consolidated: "true"
     - name: envsync
       overrides:
         - path: .github/workflows/ci.yml
           vars:
+            consolidated: "true"
             system_packages: "libsqlcipher-dev"
     - name: recall
       overrides:
         - path: .github/workflows/ci.yml
           vars:
+            consolidated: "true"
             git_identity: "true"
     - name: shell-configs
       overrides:
@@ -42,6 +48,7 @@ spec:
       overrides:
         - path: .github/workflows/ci.yml
           vars:
+            consolidated: "true"
             web: "ui/web"
             web_pm: "npm"
 

@@ -18,9 +18,76 @@ permissions:
   contents: read
 
 jobs:
+<%- if (index .Vars "consolidated") %>
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version-file: .python-version
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8.2.0
+        with:
+          version: "latest"
+          enable-cache: true
+
+      - name: Install just
+        uses: extractions/setup-just@v4
+      <%- if (index .Vars "web") %>
+      <%- if eq (index .Vars "web_pm") "pnpm" %>
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          package_json_file: <% index .Vars "web" %>/package.json
+      <%- end %>
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: <% index .Vars "web" %>/.node-version
+          cache: <% index .Vars "web_pm" %>
+          cache-dependency-path: <% index .Vars "web" %>/<% if eq (index .Vars "web_pm") "pnpm" %>pnpm-lock.yaml<% else %>package-lock.json<% end %>
+      <%- end %>
+      <%- if (index .Vars "shell") %>
+
+      - name: Install shfmt
+        uses: mfinelli/setup-shfmt@v4
+      <%- end %>
+      <%- if (index .Vars "system_packages") %>
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y <% index .Vars "system_packages" %>
+      <%- end %>
+      <%- if (index .Vars "git_identity") %>
+
+      - name: Configure git identity
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      <%- end %>
+
+      - name: Run checks
+        run: just ci
+      <%- if (index .Vars "web") %>
+
+      - name: Run web checks
+        run: just web-install web-check
+      <%- end %>
+<%- else %>
   check:
     name: ${{ matrix.name }}
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
@@ -115,6 +182,7 @@ jobs:
     if: always()
     needs: [check]
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Verify all checks passed
@@ -123,10 +191,12 @@ jobs:
             echo "One or more checks failed"
             exit 1
           fi
+<%- end %>
 <%- if (index .Vars "e2e") %>
 
   e2e:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Checkout
