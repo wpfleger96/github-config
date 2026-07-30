@@ -23,7 +23,7 @@ gh infra apply github/ --force-secrets     # Re-apply secrets (values can't be d
 | pagerduty-mcp-server | public | Full (CI+Deps+Release+Publish) | — |
 | JamBot | public | CI (CI+Deps+Justfile) | — |
 | github-config | public | Self (CI self-managed; source only) | — |
-| SNORE | public | CI (CI+Deps+Justfile+Hooks) | `vars: web: "ui", web_pm: "pnpm"` on ci.yml + Justfile; `e2e: "true"` on ci.yml |
+| SNORE | public | CI+Deps+Justfile+Hooks+Release | `vars: web: "ui", web_pm: "pnpm"` on ci.yml + Justfile; `e2e: "true"` on ci.yml |
 | shell-configs | private | Release (CI+Deps+Justfile+Release) | `vars: shell: "true"` on ci.yml + Justfile |
 | recall | private | CI (CI+Deps+Justfile) | `vars: git_identity: "true"` on ci.yml |
 | homelabconfigs | private | Deps (CI + Justfile self-managed) | — |
@@ -41,7 +41,7 @@ github/
   files-full.yaml      # publish.yml → 3 PyPI repos
   files-hooks.yaml     # .hooks/pre-commit → 11 repos
   files-justfile.yaml  # Justfile → 10 repos (homelabconfigs, syncify excluded)
-  files-release.yaml   # release.yml → 5 release-tier repos
+  files-release.yaml   # release.yml → 6 release-tier repos
   repos-public.yaml    # RepositorySet: 7 public repos (with rulesets)
   repos-private.yaml   # RepositorySet: 6 private repos (no rulesets — Free plan)
   templates/           # ci-python.yml, Justfile, auto-approve.yml, publish.yml,

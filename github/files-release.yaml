@@ -30,6 +30,11 @@ spec:
         - path: release-please-config.json
           vars:
             package_name: meowdb
+    - name: SNORE
+      overrides:
+        - path: release-please-config.json
+          vars:
+            package_name: snore
 
   files:
     - path: .github/workflows/release.yml
