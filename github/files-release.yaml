@@ -35,6 +35,11 @@ spec:
         - path: release-please-config.json
           vars:
             package_name: snore
+        # Auto-release temporarily disabled: render the workflow as manual-only
+        # instead of push-to-main. Remove this override to re-enable.
+        - path: .github/workflows/release.yml
+          vars:
+            manual_only: "true"
 
   files:
     - path: .github/workflows/release.yml

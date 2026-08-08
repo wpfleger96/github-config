@@ -1,9 +1,14 @@
 name: Release
 
 on:
+<%- if (index .Vars "manual_only") %>
+  # Auto-release is disabled for this repo. Trigger a release from the Actions tab.
+  workflow_dispatch:
+<%- else %>
   push:
     branches:
       - main
+<%- end %>
 
 permissions:
   contents: write
