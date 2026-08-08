@@ -74,7 +74,7 @@ defaults:
       sha_pinning_required: false
       workflow_permissions: write
       can_approve_pull_requests: true
-      fork_pr_approval: first_time_contributors
+      fork_pr_approval: all_external_contributors
 
 repositories:
 - name: ai-agent-rules
