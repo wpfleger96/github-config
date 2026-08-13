@@ -76,7 +76,7 @@ repositories:
     - python
     - fastapi
     - mcp
-- name: health-records-engine
+- name: chartright
   spec:
     description: "Self-hosted SMART on FHIR engine that syncs your health records into portable FHIR R4 bundles and optionally feeds a fasten-onprem viewer"
     topics:
