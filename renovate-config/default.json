@@ -40,12 +40,6 @@
       "groupSlug": "github-actions"
     },
     {
-      "matchManagers": ["pyenv", "nvm", "nodenv", "asdf", "mise"],
-      "automerge": false,
-      "groupName": "language runtimes",
-      "groupSlug": "language-runtimes"
-    },
-    {
       "matchDatasources": ["python-version", "node-version"],
       "automerge": false
     },
