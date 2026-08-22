@@ -24,13 +24,14 @@ gh infra apply github/ --force-secrets     # Re-apply secrets (values can't be d
 | JamBot | public | CI (CI+Deps+Justfile) | — |
 | github-config | public | Self (CI self-managed; source only) | — |
 | SNORE | public | CI+Deps+Justfile+Hooks+Release | `vars: web: "ui", web_pm: "pnpm"` on ci.yml + Justfile; `e2e: "true"` on ci.yml; `manual_only: "true"` on release.yml |
-| shell-configs | private | Release (CI+Deps+Justfile+Release) | `vars: shell: "true"` on ci.yml + Justfile |
+| shell-configs | public | CI+Deps+Justfile+Hooks+Release | `vars: shell: "true"` on ci.yml + Justfile; `e2e: "true"` on ci.yml |
 | recall | private | CI (CI+Deps+Justfile) | `vars: git_identity: "true"` on ci.yml |
 | homelabconfigs | private | Deps (CI + Justfile self-managed) | — |
 | meowdb | public | CI+Deps+Justfile+Hooks+Release | — |
 | syncify | private | CI+Deps+Hooks (Justfile self-managed) | `vars: web: "ui/web", web_pm: "npm"` on ci.yml |
 | envsync | private | CI (CI+Deps+Justfile+Hooks) | `vars: system_packages: "libsqlcipher-dev"` on ci.yml |
 | BOOTLEG | private | CI (CI+Deps+Justfile+Hooks) | — |
+| chartright | private | Deps (CI + Justfile self-managed) | — |
 
 ## Project Structure
 
@@ -69,7 +70,7 @@ renovate-config/
 # This file is managed by github-config. Do not edit manually.
 ```
 
-**Self-managed CI** — repos with non-standard CI requirements (multi-component stacks, non-Python toolchains) own their `.github/workflows/ci.yml` directly. github-config manages only shared configs (`renovate.json`, `auto-approve.yml`) for these repos via `files-all.yaml`. Currently self-managed: github-config (Go-based gh-infra), homelabconfigs (Terraform + Ansible). **Public self-managed repos need a per-repo `rulesets` override in `repos-public.yaml`** to match the contexts their CI actually emits — the default ruleset requires `checks`, which only `ci-python.yml` repos satisfy.
+**Self-managed CI** — repos with non-standard CI requirements (multi-component stacks, non-Python toolchains) own their `.github/workflows/ci.yml` directly. github-config manages only shared configs (`renovate.json`, `auto-approve.yml`) for these repos via `files-all.yaml`. Currently self-managed: github-config (Go-based gh-infra), homelabconfigs (Terraform + Ansible), chartright (pnpm/TypeScript monorepo). **Public self-managed repos need a per-repo `rulesets` override in `repos-public.yaml`** to match the contexts their CI actually emits — the default ruleset requires `checks`, which only `ci-python.yml` repos satisfy.
 
 **E2E testing** — the `e2e` job in `ci-python.yml` is opt-in via `vars: e2e: "true"` in `files-ci.yaml`. Currently only `ai-agent-rules` and `shell-configs` opt in. The default `main` ruleset requires only the `checks` context; `ai-agent-rules` has a per-repo ruleset override in `repos-public.yaml` that additionally requires `e2e`. The managed `Justfile` keeps e2e out of the fast run (`test: uv run pytest -m "not e2e"`) and runs them separately (`test-e2e`; `test-all` runs everything). Repos without e2e-marked tests pass trivially (the recipe tolerates pytest exit code 5 = no tests collected). To add e2e tests to a repo: create `tests/e2e/`, mark tests with `@pytest.mark.e2e`, register the marker in pyproject, and use `-m 'not e2e'` (not `--ignore`) in `addopts`.
 
