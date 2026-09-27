@@ -24,6 +24,6 @@ spec:
 
   via: push
   commit_message: |-
-    chore: sync pre-commit hook
+    chore: sync pre-commit hook<% if .Source.URL %>
 
-    <% if .Source.URL %>Source: <% .Source.URL %><% end %>
+    Source: <% .Source.URL %><% end %>

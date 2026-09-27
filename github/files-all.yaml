@@ -27,6 +27,6 @@ spec:
 
   via: push
   commit_message: |-
-    ci: sync shared files
+    ci: sync shared files<% if .Source.URL %>
 
-    <% if .Source.URL %>Source: <% .Source.URL %><% end %>
+    Source: <% .Source.URL %><% end %>

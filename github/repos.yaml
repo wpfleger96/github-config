@@ -6,8 +6,13 @@ metadata:
 defaults:
   reconcile:
     labels: additive
+  # merge_strategy is set per entry (anchors on ai-agent-rules), not here:
+  # gh-infra's mergeMergeStrategy drops the overlay's allow_auto_merge when
+  # merging onto a non-nil base merge_strategy, so any defaults-level base
+  # would silently discard auto-merge. Move it back into defaults once
+  # babarot/gh-infra#176 ships in a release.
   spec:
-    visibility: public
+    visibility: private
     archived: false
     features:
       issues: true
@@ -15,15 +20,6 @@ defaults:
       wiki: false
       discussions: false
       pull_requests: true
-    merge_strategy:
-      allow_merge_commit: false
-      allow_squash_merge: true
-      allow_rebase_merge: false
-      auto_delete_head_branches: true
-      squash_merge_commit_title: PR_TITLE
-      squash_merge_commit_message: PR_BODY
-      merge_commit_title: MERGE_MESSAGE
-      merge_commit_message: PR_TITLE
     release_immutability: false
     security:
       vulnerability_alerts: true
@@ -35,18 +31,19 @@ defaults:
       sha_pinning_required: false
       workflow_permissions: read
       can_approve_pull_requests: true
-  # Public-only settings, evaluated against each repo's current visibility at
-  # plan time. GitHub Free 403s rulesets on private repos and silently ignores
-  # allow_auto_merge there (infinite drift), so none of this may apply to them.
+  # Public-only settings, merged in at plan time against each repo's CURRENT
+  # visibility (skipped for repos that don't exist yet). Hard GitHub Free
+  # limits on private repos: rulesets (403), fork_pr_approval (rejected), and
+  # allow_auto_merge (silently ignored -> infinite drift; lives in the per-entry
+  # &public_merge_strategy anchor, see above). Private vulnerability reporting,
+  # workflow write permissions, and the release-app variables/secret are
+  # public-only by policy choice.
   when:
     visibility: public
   conditional_spec:
-    merge_strategy:
-      allow_auto_merge: true
     security:
       private_vulnerability_reporting: true
     actions:
-      enabled: true
       workflow_permissions: write
       fork_pr_approval: all_external_contributors
     rulesets:
@@ -92,6 +89,18 @@ repositories:
 # Public repos
 - name: ai-agent-rules
   spec:
+    visibility: public
+    merge_strategy: &public_merge_strategy
+      <<: &merge_strategy
+        allow_merge_commit: false
+        allow_squash_merge: true
+        allow_rebase_merge: false
+        auto_delete_head_branches: true
+        squash_merge_commit_title: PR_TITLE
+        squash_merge_commit_message: PR_BODY
+        merge_commit_title: MERGE_MESSAGE
+        merge_commit_message: PR_TITLE
+      allow_auto_merge: true
     description: "Manage configs for Claude Code, Codex, Gemini CLI, Goose, and Amp from one repo — symlinks, merge pipeline, profile inheritance, cross-machine sync"
     topics:
     - python
@@ -103,7 +112,8 @@ repositories:
   # the e2e context in addition to the default checks context.
   conditional_spec:
     rulesets:
-    - name: main
+    - &main_e2e_ruleset
+      name: main
       target: branch
       enforcement: active
       bypass_actors:
@@ -136,6 +146,8 @@ repositories:
         required_signatures: false
 - name: claude-code-status-line
   spec:
+    visibility: public
+    merge_strategy: *public_merge_strategy
     description: "Real-time status bar for Claude Code showing model, context usage, session cost, git state, and token counts via the native status line hook"
     topics:
     - python
@@ -144,6 +156,8 @@ repositories:
     - status-line
 - name: pagerduty-mcp-server
   spec:
+    visibility: public
+    merge_strategy: *public_merge_strategy
     description: "MCP server exposing PagerDuty incidents, services, schedules, and on-calls to AI agents — read, acknowledge, resolve, with OAuth and API key auth"
     topics:
     - python
@@ -152,6 +166,8 @@ repositories:
     - llm
 - name: github-config
   spec:
+    visibility: public
+    merge_strategy: *public_merge_strategy
     description: "Declarative GitHub repo configuration management (gh-infra + Renovate)"
     topics:
     - github
@@ -160,6 +176,8 @@ repositories:
     - gh-infra
 - name: SNORE
   spec:
+    visibility: public
+    merge_strategy: *public_merge_strategy
     description: "Parses ResMed CPAP binary data, scores respiratory events against AASM clinical standards, and serves results via CLI, REST API, and Vue web UI"
     topics:
     - python
@@ -170,40 +188,15 @@ repositories:
   # default checks context.
   conditional_spec:
     rulesets:
-    - name: main
-      target: branch
-      enforcement: active
-      bypass_actors:
-      - role: admin
-        bypass_mode: always
-      - app: id:3648544
-        bypass_mode: always
-      conditions:
-        ref_name:
-          include:
-          - ~DEFAULT_BRANCH
-      rules:
-        pull_request:
-          required_approving_review_count: 1
-          dismiss_stale_reviews_on_push: true
-          require_code_owner_review: false
-          require_last_push_approval: true
-          required_review_thread_resolution: true
-        required_status_checks:
-          strict_required_status_checks_policy: true
-          contexts:
-          - context: checks
-            app: github-actions
-          - context: e2e
-            app: github-actions
-        non_fast_forward: true
-        deletion: true
-        creation: false
-        required_linear_history: false
-        required_signatures: false
+    - *main_e2e_ruleset
 - name: JamBot
+  spec:
+    visibility: public
+    merge_strategy: *public_merge_strategy
 - name: meowdb
   spec:
+    visibility: public
+    merge_strategy: *public_merge_strategy
     description: "Personal cat meow audio library — record, upload, and play back clips via CLI, REST API, and web UI"
     topics:
     - python
@@ -211,6 +204,8 @@ repositories:
     - sqlite
 - name: shell-configs
   spec:
+    visibility: public
+    merge_strategy: *public_merge_strategy
     description: "Declarative dev environment manager — shell configs, packages, VS Code/Cursor settings and extensions, git, GPG signing, gh CLI extensions, and iTerm2 profiles"
     topics:
     - python
@@ -221,42 +216,12 @@ repositories:
   # so require the e2e context in addition to the default checks context.
   conditional_spec:
     rulesets:
-    - name: main
-      target: branch
-      enforcement: active
-      bypass_actors:
-      - role: admin
-        bypass_mode: always
-      - app: id:3648544
-        bypass_mode: always
-      conditions:
-        ref_name:
-          include:
-          - ~DEFAULT_BRANCH
-      rules:
-        pull_request:
-          required_approving_review_count: 1
-          dismiss_stale_reviews_on_push: true
-          require_code_owner_review: false
-          require_last_push_approval: true
-          required_review_thread_resolution: true
-        required_status_checks:
-          strict_required_status_checks_policy: true
-          contexts:
-          - context: checks
-            app: github-actions
-          - context: e2e
-            app: github-actions
-        non_fast_forward: true
-        deletion: true
-        creation: false
-        required_linear_history: false
-        required_signatures: false
+    - *main_e2e_ruleset
 
 # Private repos
 - name: recall
   spec:
-    visibility: private
+    merge_strategy: *merge_strategy
     description: "Recall is a GitHub-backed markdown wiki exposed to agents via MCP server"
     topics:
     - python
@@ -265,7 +230,7 @@ repositories:
     - markdown
 - name: homelabconfigs
   spec:
-    visibility: private
+    merge_strategy: *merge_strategy
     description: "Homelab infrastructure configuration — Terraform, Ansible, and Raspberry Pi"
     topics:
     - homelab
@@ -274,7 +239,7 @@ repositories:
     - raspberry-pi
 - name: syncify
   spec:
-    visibility: private
+    merge_strategy: *merge_strategy
     description: "Self-hosted music library sync — Python backend, React frontend, Docker Compose"
     topics:
     - python
@@ -283,7 +248,7 @@ repositories:
     - docker
 - name: envsync
   spec:
-    visibility: private
+    merge_strategy: *merge_strategy
     description: "Load secrets from Enpass password manager into environment variables"
     topics:
     - python
@@ -292,7 +257,7 @@ repositories:
     - cli
 - name: BOOTLEG
   spec:
-    visibility: private
+    merge_strategy: *merge_strategy
     description: "Multi-platform fantasy football aggregator — FastAPI REST API and MCP server"
     topics:
     - python
@@ -300,7 +265,7 @@ repositories:
     - mcp
 - name: chartright
   spec:
-    visibility: private
+    merge_strategy: *merge_strategy
     description: "Self-hosted SMART on FHIR engine that syncs your health records into portable FHIR R4 bundles and optionally feeds a fasten-onprem viewer"
     topics:
     - typescript

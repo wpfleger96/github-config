@@ -51,6 +51,6 @@ spec:
 
   via: push
   commit_message: |-
-    ci: sync CI workflow
+    ci: sync CI workflow<% if .Source.URL %>
 
-    <% if .Source.URL %>Source: <% .Source.URL %><% end %>
+    Source: <% .Source.URL %><% end %>

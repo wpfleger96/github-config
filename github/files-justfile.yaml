@@ -31,6 +31,6 @@ spec:
 
   via: push
   commit_message: |-
-    chore: sync Justfile
+    chore: sync Justfile<% if .Source.URL %>
 
-    <% if .Source.URL %>Source: <% .Source.URL %><% end %>
+    Source: <% .Source.URL %><% end %>
