@@ -40,6 +40,6 @@ jobs:
           mv gh-infra "$EXT_DIR/gh-infra"
 
       - name: Detect drift
-        run: gh infra plan github/ --ci
+        run: gh infra plan github/ --ci --diff
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}

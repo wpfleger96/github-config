@@ -26,4 +26,7 @@ spec:
       source: ./templates/auto-approve.yml
 
   via: push
-  commit_message: "ci: sync shared files"
+  commit_message: |-
+    ci: sync shared files
+
+    <% if .Source.URL %>Source: <% .Source.URL %><% end %>

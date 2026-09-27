@@ -12,7 +12,7 @@ gh infra apply github/ --force-secrets     # Re-apply secrets (values can't be d
 ```
 
 > **Local gh-infra binary:** Build from the fork's dev branch (CI does too).
-> `cd ~/Development/Personal/gh-infra && git pull && go build -o gh-infra ./cmd/gh-infra/`
+> `cd ~/Development/gh-infra && git pull && go build -o gh-infra ./cmd/gh-infra/`
 
 ## Managed Repos
 
@@ -43,8 +43,7 @@ github/
   files-hooks.yaml     # .hooks/pre-commit → 11 repos
   files-justfile.yaml  # Justfile → 10 repos (homelabconfigs, syncify excluded)
   files-release.yaml   # release.yml → 6 release-tier repos
-  repos-public.yaml    # RepositorySet: 7 public repos (with rulesets)
-  repos-private.yaml   # RepositorySet: 6 private repos (no rulesets — Free plan)
+  repos.yaml           # RepositorySet: 14 repos (8 public, 6 private); public-only settings via when/conditional_spec
   templates/           # ci-python.yml, Justfile, auto-approve.yml, publish.yml,
                        # release.yml, renovate.json
 renovate-config/
@@ -54,7 +53,13 @@ renovate-config/
 
 ## Key Patterns
 
-**FileSet vs RepositorySet:** `files-*.yaml` distributes template files to repos (`via: push` = direct commit, no PR). `repos-*.yaml` manages repo settings. Per-repo overrides use `vars:` (template variables) or `source:` (different file entirely).
+**FileSet vs RepositorySet:** `files-*.yaml` distributes template files to repos (`via: push` = direct commit, no PR). `repos.yaml` manages repo settings. Per-repo overrides use `vars:` (template variables) or `source:` (different file entirely).
+
+**Conditional settings** — `repos.yaml` `defaults.spec` holds the settings shared by every repo (the private profile). Public-only settings (auto-merge, private vulnerability reporting, workflow write permissions, fork PR approval, rulesets, release-app variables/secret) live in `defaults.conditional_spec` under `when: {visibility: public}`. The condition is evaluated against each repo's CURRENT visibility at plan time, so flipping a repo's visibility (`spec.visibility`) takes two applies: the first changes visibility, the second applies or drops the conditional block. An entry's own `conditional_spec` merges over the defaults' by key (same-named ruleset replaces the whole ruleset); there is no per-entry opt-out.
+
+**Secrets** — secret values may only reference `${ENV_*}` variables; `apply` errors on non-prefixed refs and on unset/empty `ENV_*` vars (`plan` skips resolution). `infra-apply.yml` exports `ENV_RELEASE_APP_PRIVATE_KEY`; for a local apply, `export ENV_RELEASE_APP_PRIVATE_KEY=...` first.
+
+**FileSet commit messages** — `commit_message` is a `<% %>` template with `.Repo` and `.Source.URL` (from `GH_INFRA_SOURCE_URL`, set in `infra-apply.yml` to the triggering commit). Every FileSet appends a `Source:` link guarded by `<% if .Source.URL %>` so local applies don't emit a dangling line. `.Vars` is not available in commit messages.
 
 **Go template syntax — always use `index`, never direct field access:**
 ```
@@ -70,9 +75,9 @@ renovate-config/
 # This file is managed by github-config. Do not edit manually.
 ```
 
-**Self-managed CI** — repos with non-standard CI requirements (multi-component stacks, non-Python toolchains) own their `.github/workflows/ci.yml` directly. github-config manages only shared configs (`renovate.json`, `auto-approve.yml`) for these repos via `files-all.yaml`. Currently self-managed: github-config (Go-based gh-infra), homelabconfigs (Terraform + Ansible), chartright (pnpm/TypeScript monorepo). **Public self-managed repos need a per-repo `rulesets` override in `repos-public.yaml`** to match the contexts their CI actually emits — the default ruleset requires `checks`, which only `ci-python.yml` repos satisfy.
+**Self-managed CI** — repos with non-standard CI requirements (multi-component stacks, non-Python toolchains) own their `.github/workflows/ci.yml` directly. github-config manages only shared configs (`renovate.json`, `auto-approve.yml`) for these repos via `files-all.yaml`. Currently self-managed: github-config (Go-based gh-infra), homelabconfigs (Terraform + Ansible), chartright (pnpm/TypeScript monorepo). **Public self-managed repos need a per-repo override in their `repos.yaml` entry's `conditional_spec.rulesets`** unless their CI emits the contexts the default ruleset requires (`checks`). github-config's CI emits `checks`, so it needs no override.
 
-**E2E testing** — the `e2e` job in `ci-python.yml` is opt-in via `vars: e2e: "true"` in `files-ci.yaml`. Currently only `ai-agent-rules` and `shell-configs` opt in. The default `main` ruleset requires only the `checks` context; `ai-agent-rules` has a per-repo ruleset override in `repos-public.yaml` that additionally requires `e2e`. The managed `Justfile` keeps e2e out of the fast run (`test: uv run pytest -m "not e2e"`) and runs them separately (`test-e2e`; `test-all` runs everything). Repos without e2e-marked tests pass trivially (the recipe tolerates pytest exit code 5 = no tests collected). To add e2e tests to a repo: create `tests/e2e/`, mark tests with `@pytest.mark.e2e`, register the marker in pyproject, and use `-m 'not e2e'` (not `--ignore`) in `addopts`.
+**E2E testing** — the `e2e` job in `ci-python.yml` is opt-in via `vars: e2e: "true"` in `files-ci.yaml`. Currently `ai-agent-rules`, `SNORE`, and `shell-configs` opt in. The default `main` ruleset requires only the `checks` context; each opted-in repo has a per-repo `conditional_spec.rulesets` override in `repos.yaml` that additionally requires `e2e`. The managed `Justfile` keeps e2e out of the fast run (`test: uv run pytest -m "not e2e"`) and runs them separately (`test-e2e`; `test-all` runs everything). Repos without e2e-marked tests pass trivially (the recipe tolerates pytest exit code 5 = no tests collected). To add e2e tests to a repo: create `tests/e2e/`, mark tests with `@pytest.mark.e2e`, register the marker in pyproject, and use `-m 'not e2e'` (not `--ignore`) in `addopts`.
 
 **Web frontends** — repos with a JS/TS frontend opt in via `web` (frontend directory) + `web_pm` (`npm` or `pnpm`) vars on ci.yml in `files-ci.yaml`. This renders a `web` matrix leg running `just web-install web-check`, Node setup pinned by `<web>/.node-version`, and a `pnpm/action-setup` step when `web_pm: "pnpm"`. The same vars on the Justfile FileSet render managed `web-*` recipes (SNORE). syncify self-manages its Justfile but conforms to the `web-*` recipe contract. Managed `web-*` recipes call package.json scripts, which must be named `type-check`, `lint-check`, `format-check`, `lint`, `format`, `build`. `check-all` appends `web-install web-check` and `pre-commit` appends `web-install web-type-check web-lint web-format` for repos with the `web` var, so the managed pre-commit hook auto-fixes UI issues at commit time. `check` and `ci` still exclude web checks — the CI web leg runs them separately.
 
@@ -80,9 +85,9 @@ renovate-config/
 
 1. **`ci-python.yml` excluded from actionlint** — `<% %>` directives are not valid YAML; CI explicitly skips it. Don't "fix" the syntax errors — they're intentional template directives.
 
-2. **gh-infra must come from `wpfleger96/gh-infra -b dev`** — fork's dev branch merges 3 in-flight upstream contributions (#159, #160, #161). All 4 CI workflows build from this branch; local dev must too.
+2. **gh-infra must come from `wpfleger96/gh-infra -b dev`** — `dev` is `upstream/main` with in-flight PRs #160, #161, #163, #164, #167, #169 merged in, and is rebuilt from `upstream/main` as upstream merges them. All 4 CI workflows build from this branch; local dev must too. Switch to a pinned release once they all ship.
 
-3. **Private repos ignore `allow_auto_merge`** — GitHub Free plan silently accepts the API call but never applies it without rulesets. Intentionally absent from `repos-private.yaml`; adding it back causes infinite plan drift.
+3. **Private repos ignore `allow_auto_merge`** — GitHub Free plan silently accepts the API call but never applies it without rulesets. `allow_auto_merge` lives only in `defaults.conditional_spec` (public); adding it to `defaults.spec` causes infinite plan drift on private repos.
 
 4. **`via: push` needs the `workflow` OAuth scope** — `gh infra apply` uses `CreateCommitOnBranch` GraphQL to push to `.github/workflows/`. Confirm scope: `gh auth status`.
 
@@ -92,7 +97,7 @@ renovate-config/
 
 7. **`release.yml` excluded from actionlint** — stale `@v3` metadata triggers actionlint#648; CI explicitly skips it.
 
-8. **`fork_pr_approval` is public-only** — `gh infra validate` and `plan` both hard-reject it on private repos. It lives in `repos-public.yaml` `defaults.spec.actions` only; private repos have no equivalent setting. Set to `all_external_contributors` so every fork PR from an outside contributor needs maintainer approval before CI runs, not just first-timers.
+8. **`fork_pr_approval` is public-only** — `gh infra validate` and `plan` both hard-reject it on private repos. It lives in `repos.yaml` `defaults.conditional_spec.actions` only; private repos have no equivalent setting. Set to `all_external_contributors` so every fork PR from an outside contributor needs maintainer approval before CI runs, not just first-timers.
 
 9. **No `$comment` in `renovate.json`** — Renovate's config validator only whitelists `$schema` as an ignored key. Any other unrecognized field (including `$comment`) is rejected as an invalid config option. Use a YAML/JSON comment-less approach or put provenance in the managed-file header for non-JSON formats only.
 
@@ -100,11 +105,11 @@ renovate-config/
 
 | Task | File(s) |
 |------|---------|
-| Add repo to management | `github/repos-public.yaml` or `repos-private.yaml` + relevant `files-*.yaml` |
+| Add repo to management | `github/repos.yaml` (+ `spec.visibility: private` for private repos) + relevant `files-*.yaml` |
 | Distribute a new file | `github/templates/` + new or existing `files-*.yaml` |
 | Update CI template | `github/templates/ci-python.yml` |
 | Update shared Justfile | `github/templates/Justfile` |
 | Update Renovate preset | `renovate-config/default.json` |
-| Change branch protection | `github/repos-public.yaml` → rulesets section |
-| Add repo secret/variable | `github/repos-public.yaml` or `repos-private.yaml` per-repo `spec` |
+| Change branch protection | `github/repos.yaml` → `defaults.conditional_spec.rulesets` (per-repo: entry `conditional_spec.rulesets`) |
+| Add repo secret/variable | `github/repos.yaml` per-repo `spec` (secret values must be `${ENV_*}` refs) |
 | Change infra workflows | `.github/workflows/infra-plan.yml` / `infra-apply.yml` / `infra-drift.yml` |

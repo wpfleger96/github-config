@@ -14,4 +14,7 @@ spec:
       source: ./templates/publish.yml
 
   via: push
-  commit_message: "ci: sync publish workflow"
+  commit_message: |-
+    ci: sync publish workflow
+
+    <% if .Source.URL %>Source: <% .Source.URL %><% end %>

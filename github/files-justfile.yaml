@@ -30,4 +30,7 @@ spec:
       source: ./templates/Justfile
 
   via: push
-  commit_message: "chore: sync Justfile"
+  commit_message: |-
+    chore: sync Justfile
+
+    <% if .Source.URL %>Source: <% .Source.URL %><% end %>

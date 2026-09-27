@@ -48,4 +48,7 @@ spec:
       source: ./templates/release-please-config.json
 
   via: push
-  commit_message: "ci: sync release workflow"
+  commit_message: |-
+    ci: sync release workflow
+
+    <% if .Source.URL %>Source: <% .Source.URL %><% end %>
