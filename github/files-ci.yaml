@@ -50,4 +50,7 @@ spec:
       source: ./templates/ci-python.yml
 
   via: push
-  commit_message: "ci: sync CI workflow"
+  commit_message: |-
+    ci: sync CI workflow<% if .Source.URL %>
+
+    Source: <% .Source.URL %><% end %>

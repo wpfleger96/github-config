@@ -23,4 +23,7 @@ spec:
       executable: true
 
   via: push
-  commit_message: "chore: sync pre-commit hook"
+  commit_message: |-
+    chore: sync pre-commit hook<% if .Source.URL %>
+
+    Source: <% .Source.URL %><% end %>

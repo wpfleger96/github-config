@@ -24,7 +24,10 @@ jobs:
           owner: ${{ github.repository_owner }}
 
       - name: Clone gh-infra
-        run: git clone --depth 1 -b dev https://github.com/wpfleger96/gh-infra.git /tmp/gh-infra
+        run: |
+          git init -q /tmp/gh-infra
+          git -C /tmp/gh-infra fetch -q --depth 1 https://github.com/wpfleger96/gh-infra.git "$(cat .gh-infra-ref)"
+          git -C /tmp/gh-infra checkout -q FETCH_HEAD
 
       - name: Set up Go
         uses: actions/setup-go@v7
@@ -40,6 +43,6 @@ jobs:
           mv gh-infra "$EXT_DIR/gh-infra"
 
       - name: Detect drift
-        run: gh infra plan github/ --ci
+        run: gh infra plan github/ --ci --diff
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}

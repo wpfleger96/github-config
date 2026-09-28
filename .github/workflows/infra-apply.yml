@@ -29,7 +29,10 @@ jobs:
           owner: ${{ github.repository_owner }}
 
       - name: Clone gh-infra
-        run: git clone --depth 1 -b dev https://github.com/wpfleger96/gh-infra.git /tmp/gh-infra
+        run: |
+          git init -q /tmp/gh-infra
+          git -C /tmp/gh-infra fetch -q --depth 1 https://github.com/wpfleger96/gh-infra.git "$(cat .gh-infra-ref)"
+          git -C /tmp/gh-infra checkout -q FETCH_HEAD
 
       - name: Set up Go
         uses: actions/setup-go@v7
@@ -49,4 +52,5 @@ jobs:
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
           GH_INFRA_OUTPUT: stream
-          RELEASE_APP_PRIVATE_KEY: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+          ENV_RELEASE_APP_PRIVATE_KEY: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+          GH_INFRA_SOURCE_URL: ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}
