@@ -16,6 +16,9 @@ defaults:
       discussions: false
       pull_requests: true
     release_immutability: false
+    # merge_commit_title/message omitted: merge commits are disabled, and gh-infra
+    # rejects changes to a disabled type's title/message (babarot/gh-infra#177).
+    # Add them back in the same change if allow_merge_commit is ever enabled.
     merge_strategy:
       allow_merge_commit: false
       allow_squash_merge: true
