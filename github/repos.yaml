@@ -6,11 +6,6 @@ metadata:
 defaults:
   reconcile:
     labels: additive
-  # merge_strategy is set per entry (anchors on ai-agent-rules), not here:
-  # gh-infra's mergeMergeStrategy drops the overlay's allow_auto_merge when
-  # merging onto a non-nil base merge_strategy, so any defaults-level base
-  # would silently discard auto-merge. Move it back into defaults once
-  # babarot/gh-infra#176 ships in a release.
   spec:
     visibility: private
     archived: false
@@ -21,6 +16,16 @@ defaults:
       discussions: false
       pull_requests: true
     release_immutability: false
+    # merge_commit_title/message omitted: merge commits are disabled, and gh-infra
+    # rejects changes to a disabled type's title/message (babarot/gh-infra#177).
+    # Add them back in the same change if allow_merge_commit is ever enabled.
+    merge_strategy:
+      allow_merge_commit: false
+      allow_squash_merge: true
+      allow_rebase_merge: false
+      auto_delete_head_branches: true
+      squash_merge_commit_title: PR_TITLE
+      squash_merge_commit_message: PR_BODY
     security:
       vulnerability_alerts: true
       automated_security_fixes: false
@@ -34,13 +39,14 @@ defaults:
   # Public-only settings, merged in at plan time against each repo's CURRENT
   # visibility (skipped for repos that don't exist yet). Hard GitHub Free
   # limits on private repos: rulesets (403), fork_pr_approval (rejected), and
-  # allow_auto_merge (silently ignored -> infinite drift; lives in the per-entry
-  # &public_merge_strategy anchor, see above). Private vulnerability reporting,
-  # workflow write permissions, and the release-app variables/secret are
-  # public-only by policy choice.
+  # allow_auto_merge (silently ignored -> infinite drift). Private
+  # vulnerability reporting, workflow write permissions, and the release-app
+  # variables/secret are public-only by policy choice.
   when:
     visibility: public
   conditional_spec:
+    merge_strategy:
+      allow_auto_merge: true
     security:
       private_vulnerability_reporting: true
     actions:
@@ -90,17 +96,6 @@ repositories:
 - name: ai-agent-rules
   spec:
     visibility: public
-    merge_strategy: &public_merge_strategy
-      <<: &merge_strategy
-        allow_merge_commit: false
-        allow_squash_merge: true
-        allow_rebase_merge: false
-        auto_delete_head_branches: true
-        squash_merge_commit_title: PR_TITLE
-        squash_merge_commit_message: PR_BODY
-        merge_commit_title: MERGE_MESSAGE
-        merge_commit_message: PR_TITLE
-      allow_auto_merge: true
     description: "Manage configs for Claude Code, Codex, Gemini CLI, Goose, and Amp from one repo — symlinks, merge pipeline, profile inheritance, cross-machine sync"
     topics:
     - python
@@ -147,7 +142,6 @@ repositories:
 - name: claude-code-status-line
   spec:
     visibility: public
-    merge_strategy: *public_merge_strategy
     description: "Real-time status bar for Claude Code showing model, context usage, session cost, git state, and token counts via the native status line hook"
     topics:
     - python
@@ -157,7 +151,6 @@ repositories:
 - name: pagerduty-mcp-server
   spec:
     visibility: public
-    merge_strategy: *public_merge_strategy
     description: "MCP server exposing PagerDuty incidents, services, schedules, and on-calls to AI agents — read, acknowledge, resolve, with OAuth and API key auth"
     topics:
     - python
@@ -167,7 +160,6 @@ repositories:
 - name: github-config
   spec:
     visibility: public
-    merge_strategy: *public_merge_strategy
     description: "Declarative GitHub repo configuration management (gh-infra + Renovate)"
     topics:
     - github
@@ -177,7 +169,6 @@ repositories:
 - name: SNORE
   spec:
     visibility: public
-    merge_strategy: *public_merge_strategy
     description: "Parses ResMed CPAP binary data, scores respiratory events against AASM clinical standards, and serves results via CLI, REST API, and Vue web UI"
     topics:
     - python
@@ -192,11 +183,9 @@ repositories:
 - name: JamBot
   spec:
     visibility: public
-    merge_strategy: *public_merge_strategy
 - name: meowdb
   spec:
     visibility: public
-    merge_strategy: *public_merge_strategy
     description: "Personal cat meow audio library — record, upload, and play back clips via CLI, REST API, and web UI"
     topics:
     - python
@@ -205,7 +194,6 @@ repositories:
 - name: shell-configs
   spec:
     visibility: public
-    merge_strategy: *public_merge_strategy
     description: "Declarative dev environment manager — shell configs, packages, VS Code/Cursor settings and extensions, git, GPG signing, gh CLI extensions, and iTerm2 profiles"
     topics:
     - python
@@ -221,7 +209,6 @@ repositories:
 # Private repos
 - name: recall
   spec:
-    merge_strategy: *merge_strategy
     description: "Recall is a GitHub-backed markdown wiki exposed to agents via MCP server"
     topics:
     - python
@@ -230,7 +217,6 @@ repositories:
     - markdown
 - name: homelabconfigs
   spec:
-    merge_strategy: *merge_strategy
     description: "Homelab infrastructure configuration — Terraform, Ansible, and Raspberry Pi"
     topics:
     - homelab
@@ -239,7 +225,6 @@ repositories:
     - raspberry-pi
 - name: syncify
   spec:
-    merge_strategy: *merge_strategy
     description: "Self-hosted music library sync — Python backend, React frontend, Docker Compose"
     topics:
     - python
@@ -248,7 +233,6 @@ repositories:
     - docker
 - name: envsync
   spec:
-    merge_strategy: *merge_strategy
     description: "Load secrets from Enpass password manager into environment variables"
     topics:
     - python
@@ -257,7 +241,6 @@ repositories:
     - cli
 - name: BOOTLEG
   spec:
-    merge_strategy: *merge_strategy
     description: "Multi-platform fantasy football aggregator — FastAPI REST API and MCP server"
     topics:
     - python
@@ -265,7 +248,6 @@ repositories:
     - mcp
 - name: chartright
   spec:
-    merge_strategy: *merge_strategy
     description: "Self-hosted SMART on FHIR engine that syncs your health records into portable FHIR R4 bundles and optionally feeds a fasten-onprem viewer"
     topics:
     - typescript

@@ -44,8 +44,8 @@ github/
   files-justfile.yaml  # Justfile → 10 repos (github-config, homelabconfigs, syncify, chartright excluded)
   files-release.yaml   # release.yml + release-please-config.json → 6 release-tier repos
   repos.yaml           # RepositorySet: 14 repos (8 public, 6 private). Defaults = private profile;
-                       # public-only settings via when/conditional_spec; merge_strategy,
-                       # visibility: public, and the e2e ruleset are per-entry YAML anchors
+                       # public-only settings via when/conditional_spec; visibility: public
+                       # is per-entry; the e2e ruleset is a per-entry YAML anchor
   templates/           # ci-python.yml, Justfile, auto-approve.yml, publish.yml, pre-commit-hook,
                        # release.yml, release-please-config.json, renovate.json
 renovate-config/
@@ -57,12 +57,10 @@ renovate-config/
 
 **FileSet vs RepositorySet:** `files-*.yaml` distributes template files to repos (`via: push` = direct commit, no PR). `repos.yaml` manages repo settings. Per-repo overrides use `vars:` (template variables) or `source:` (different file entirely).
 
-**Conditional settings** — `repos.yaml` `defaults.spec` holds the settings shared by every repo (the private profile, including `visibility: private`, so a public entry must say `visibility: public` explicitly — omitting it fails closed). Public-only settings (private vulnerability reporting, workflow write permissions, fork PR approval, rulesets, release-app variables/secret) live in `defaults.conditional_spec` under `when: {visibility: public}`. gh-infra's `ResolveConditional` evaluates the condition against each repo's CURRENT visibility at plan time and skips repos that don't exist yet. An entry's own `conditional_spec` merges over the defaults' by key (same-named ruleset replaces the whole ruleset); there is no per-entry opt-out. Consequences:
-- **New public repo** — created without the conditional settings (ruleset, fork PR approval, private vulnerability reporting, workflow write, release-app vars/secret); auto-merge is per-entry so it lands immediately. The rest lands on the next apply: next push to `main`, `gh workflow run infra-apply.yml`, or a local `gh infra apply github/`.
+**Conditional settings** — `repos.yaml` `defaults.spec` holds the settings shared by every repo (the private profile, including `visibility: private`, so a public entry must say `visibility: public` explicitly — omitting it fails closed). Public-only settings (auto-merge, private vulnerability reporting, workflow write permissions, fork PR approval, rulesets, release-app variables/secret) live in `defaults.conditional_spec` under `when: {visibility: public}`. gh-infra's `ResolveConditional` evaluates the condition against each repo's CURRENT visibility at plan time and skips repos that don't exist yet. An entry's own `conditional_spec` merges over the defaults' by key (same-named ruleset replaces the whole ruleset); there is no per-entry opt-out. Consequences:
+- **New public repo** — created without the conditional settings (auto-merge, ruleset, fork PR approval, private vulnerability reporting, workflow write, release-app vars/secret); they land on the next apply: next push to `main`, `gh workflow run infra-apply.yml`, or a local `gh infra apply github/`.
 - **Private → public** — two applies: the first flips visibility, the second applies the conditional block.
 - **Public → private** — the conditional block (incl. `fork_pr_approval`) is still merged against the current public visibility while the spec says private, so validation aborts the WHOLE plan. Flip the repo to private in the GitHub UI first, change its `visibility` in `repos.yaml` in the same change, then apply.
-
-**Per-entry `merge_strategy` (workaround)** — gh-infra's `mergeMergeStrategy` drops the overlay's `allow_auto_merge` when merging onto a non-nil base `merge_strategy`, so `merge_strategy` is not in `defaults` at all. `ai-agent-rules` defines two anchors: `&merge_strategy` (the 8 shared fields) and `&public_merge_strategy` (`<<: *merge_strategy` + `allow_auto_merge: true`). Public entries use `merge_strategy: *public_merge_strategy`, private entries `merge_strategy: *merge_strategy`; every new entry needs one. The pinned `dev` build already carries the fix ([gh-infra#176](https://github.com/babarot/gh-infra/pull/176)); the anchors keep the manifest correct on any gh-infra build without it, e.g. a release. Move it back into `defaults`/`conditional_spec` once #176 ships in a release.
 
 **Secrets** — secret values may only reference `${ENV_*}` variables; `apply` errors on non-prefixed refs and on unset/empty `ENV_*` vars (`plan` skips resolution). `infra-apply.yml` exports `ENV_RELEASE_APP_PRIVATE_KEY`. Every local `gh infra apply` needs it exported first — secret refs are resolved across ALL repos, even with `-r <private repo>`. `plan` and `validate` don't need it.
 
@@ -92,9 +90,9 @@ renovate-config/
 
 1. **`ci-python.yml` excluded from actionlint** — `<% %>` directives are not valid YAML; CI explicitly skips it. Don't "fix" the syntax errors — they're intentional template directives.
 
-2. **gh-infra is pinned to a `wpfleger96/gh-infra` `dev` commit** — all 4 CI workflows fetch the SHA in `.gh-infra-ref`; bump it after every `dev` rebuild (a `dev` that lost a merged PR would otherwise silently change behavior, e.g. commit templates landing as literal text). `dev` is `upstream/main` with in-flight PRs [gh-infra#160](https://github.com/babarot/gh-infra/pull/160), [gh-infra#161](https://github.com/babarot/gh-infra/pull/161), [gh-infra#163](https://github.com/babarot/gh-infra/pull/163), [gh-infra#164](https://github.com/babarot/gh-infra/pull/164), [gh-infra#167](https://github.com/babarot/gh-infra/pull/167), [gh-infra#169](https://github.com/babarot/gh-infra/pull/169), [gh-infra#176](https://github.com/babarot/gh-infra/pull/176) merged in, and is rebuilt from `upstream/main` as upstream merges them. Local builds must use the same SHA. Switch to a pinned release once they all ship.
+2. **gh-infra is pinned to a `wpfleger96/gh-infra` `dev` commit** — all 4 CI workflows fetch the SHA in `.gh-infra-ref`; bump it after every `dev` rebuild (a `dev` that lost a merged PR would otherwise silently change behavior, e.g. commit templates landing as literal text). `dev` is `upstream/main` with in-flight PRs [gh-infra#160](https://github.com/babarot/gh-infra/pull/160), [gh-infra#161](https://github.com/babarot/gh-infra/pull/161), [gh-infra#164](https://github.com/babarot/gh-infra/pull/164), [gh-infra#167](https://github.com/babarot/gh-infra/pull/167) merged in, and is rebuilt from `upstream/main` as upstream merges them. Local builds must use the same SHA. Switch to a pinned release once they all ship.
 
-3. **Private repos ignore `allow_auto_merge`** — GitHub Free plan silently accepts the API call but never applies it without rulesets. `allow_auto_merge` lives only in the `&public_merge_strategy` anchor used by public entries; adding it to the private `&merge_strategy` anchor causes infinite plan drift on private repos.
+3. **Private repos ignore `allow_auto_merge`** — GitHub Free plan silently accepts the API call but never applies it without rulesets. `allow_auto_merge` lives only in `defaults.conditional_spec.merge_strategy` (public repos); adding it to `defaults.spec.merge_strategy` causes infinite plan drift on private repos.
 
 4. **`via: push` needs the `workflow` OAuth scope** — `gh infra apply` uses `CreateCommitOnBranch` GraphQL to push to `.github/workflows/`. Confirm scope: `gh auth status`.
 
@@ -114,7 +112,7 @@ renovate-config/
 
 | Task | File(s) |
 |------|---------|
-| Add repo to management | `github/repos.yaml` (public: `visibility: public` + `merge_strategy: *public_merge_strategy`; private: `merge_strategy: *merge_strategy`) + relevant `files-*.yaml` |
+| Add repo to management | `github/repos.yaml` (public entries need `visibility: public`; private ones inherit it from `defaults`) + relevant `files-*.yaml` |
 | Distribute a new file | `github/templates/` + new or existing `files-*.yaml` |
 | Update CI template | `github/templates/ci-python.yml` |
 | Update shared Justfile | `github/templates/Justfile` |
