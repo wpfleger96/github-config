@@ -255,3 +255,4 @@ repositories:
     - smart-on-fhir
     - health-records
     - self-hosted
+- name: medical
