@@ -32,7 +32,7 @@ gh infra apply github/ --force-secrets     # Re-apply secrets (values can't be d
 | envsync | private | CI (CI+Deps+Justfile+Hooks) | `vars: system_packages: "libsqlcipher-dev"` on ci.yml |
 | BOOTLEG | private | CI (CI+Deps+Justfile+Hooks) | — |
 | chartright | private | Deps (CI + Justfile self-managed) | — |
-| medical | private | Settings only (no managed files) | — |
+| medical | private | Settings only (no managed files; Actions disabled) | — |
 
 ## Project Structure
 
@@ -92,7 +92,7 @@ renovate-config/
 
 1. **`ci-python.yml` excluded from actionlint** — `<% %>` directives are not valid YAML; CI explicitly skips it. Don't "fix" the syntax errors — they're intentional template directives.
 
-2. **gh-infra is pinned to a `wpfleger96/gh-infra` `dev` commit** — all 4 CI workflows fetch the SHA in `.gh-infra-ref`; bump it after every `dev` rebuild (a `dev` that lost a merged PR would otherwise silently change behavior, e.g. commit templates landing as literal text). `dev` is `upstream/main` with in-flight PRs [gh-infra#160](https://github.com/babarot/gh-infra/pull/160), [gh-infra#164](https://github.com/babarot/gh-infra/pull/164), [gh-infra#203](https://github.com/babarot/gh-infra/pull/203) merged in, and is rebuilt from `upstream/main` as upstream merges them. Local builds must use the same SHA. Switch to a pinned release once they all ship.
+2. **gh-infra is pinned to a `wpfleger96/gh-infra` `dev` commit** — all 4 CI workflows fetch the SHA in `.gh-infra-ref`; bump it after every `dev` rebuild (a `dev` that lost a merged PR would otherwise silently change behavior, e.g. commit templates landing as literal text). `dev` is `upstream/main` with in-flight PRs [gh-infra#160](https://github.com/babarot/gh-infra/pull/160), [gh-infra#164](https://github.com/babarot/gh-infra/pull/164), [gh-infra#203](https://github.com/babarot/gh-infra/pull/203) merged in, plus [gh-infra#210](https://github.com/babarot/gh-infra/pull/210) (disabling Actions sends only `enabled`) cherry-picked, and is rebuilt from `upstream/main` as upstream merges them. Local builds must use the same SHA. Switch to a pinned release once they all ship.
 
 3. **Private repos ignore `allow_auto_merge`** — GitHub Free plan silently accepts the API call but never applies it without rulesets. `allow_auto_merge` lives only in `defaults.conditional_spec.merge_strategy` (public repos); adding it to `defaults.spec.merge_strategy` causes infinite plan drift on private repos.
 
