@@ -1,6 +1,7 @@
 apiVersion: gh-infra/v1
 kind: FileSet
 metadata:
+  name: full
   owner: wpfleger96
 
 spec:
