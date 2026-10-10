@@ -55,14 +55,15 @@ renovate-config/
 
 ## Key Patterns
 
-**FileSet vs RepositorySet:** `files-*.yaml` distributes template files to repos (`via: push` = direct commit, no PR). `repos.yaml` manages repo settings. Per-repo overrides use `vars:` (template variables) or `source:` (different file entirely). Every FileSet sets a unique `metadata.name`: unnamed FileSets are identified by owner + sorted repo list, so two with the same repos (`files-ci.yaml` and `files-hooks.yaml`) share an identity, and gh-infra builds without [gh-infra#203](https://github.com/babarot/gh-infra/pull/203) commit one's changes under the other's `commit_message`.
-
+**FileSet vs RepositorySet:** `files-*.yaml` distributes template files to repos (`via: push` = direct commit, no PR). `repos.yaml` manages repo settings. Per-repo overrides use `vars:` (template variables) or `source:` (different file entirely).
 **Conditional settings** — `repos.yaml` `defaults.spec` holds the settings shared by every repo (the private profile, including `visibility: private`, so a public entry must say `visibility: public` explicitly — omitting it fails closed). Public-only settings (auto-merge, private vulnerability reporting, workflow write permissions, fork PR approval, rulesets, release-app variables/secret) live in `defaults.conditional_spec` under `when: {visibility: public}`. gh-infra's `ResolveConditional` evaluates the condition against each repo's CURRENT visibility at plan time and skips repos that don't exist yet. An entry's own `conditional_spec` merges over the defaults' by key (same-named ruleset replaces the whole ruleset); there is no per-entry opt-out. Consequences:
 - **New public repo** — created without the conditional settings (auto-merge, ruleset, fork PR approval, private vulnerability reporting, workflow write, release-app vars/secret); they land on the next apply: next push to `main`, `gh workflow run infra-apply.yml`, or a local `gh infra apply github/`.
 - **Private → public** — two applies: the first flips visibility, the second applies the conditional block.
 - **Public → private** — the conditional block (incl. `fork_pr_approval`) is still merged against the current public visibility while the spec says private, so validation aborts the WHOLE plan. Flip the repo to private in the GitHub UI first, change its `visibility` in `repos.yaml` in the same change, then apply.
 
 **Secrets** — secret values may only reference `${ENV_*}` variables; `apply` errors on non-prefixed refs and on unset/empty `ENV_*` vars (`plan` skips resolution). `infra-apply.yml` exports `ENV_RELEASE_APP_PRIVATE_KEY`. Every local `gh infra apply` needs it exported first — secret refs are resolved across ALL repos, even with `-r <private repo>`. `plan` and `validate` don't need it.
+
+**FileSet names** — every `files-<x>.yaml` sets `metadata.name: <x>`. Without a name, gh-infra identifies a FileSet by owner + sorted repo list, which `files-ci.yaml` and `files-hooks.yaml` would share. That identity labels the FileSet in plan output and names the default `via: pull_request` branch (`gh-infra/sync-<owner>-<name>`); with [gh-infra#203](https://github.com/babarot/gh-infra/pull/203), `validate` rejects two `pull_request` FileSets that would share that branch on a repo. gh-infra builds without #203 commit one colliding FileSet's changes under the other's `commit_message`.
 
 **FileSet commit messages** — `commit_message` is a `<% %>` template with `.Repo` and `.Source.URL` (from `GH_INFRA_SOURCE_URL`, set in `infra-apply.yml` to the triggering commit). Every FileSet appends a `Source:` link; the blank separator line lives inside the `<% if .Source.URL %>` guard so local applies don't leave trailing blank lines. `.Vars` is not available in commit messages.
 
@@ -113,7 +114,7 @@ renovate-config/
 | Task | File(s) |
 |------|---------|
 | Add repo to management | `github/repos.yaml` (public entries need `visibility: public`; private ones inherit it from `defaults`) + relevant `files-*.yaml` |
-| Distribute a new file | `github/templates/` + new or existing `files-*.yaml` |
+| Distribute a new file | `github/templates/` + new or existing `files-*.yaml` (a new FileSet sets `metadata.name`) |
 | Update CI template | `github/templates/ci-python.yml` |
 | Update shared Justfile | `github/templates/Justfile` |
 | Update Renovate preset | `renovate-config/default.json` |
