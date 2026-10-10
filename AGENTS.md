@@ -32,7 +32,7 @@ gh infra apply github/ --force-secrets     # Re-apply secrets (values can't be d
 | envsync | private | CI (CI+Deps+Justfile+Hooks) | `vars: system_packages: "libsqlcipher-dev"` on ci.yml |
 | BOOTLEG | private | CI (CI+Deps+Justfile+Hooks) | — |
 | chartright | private | Deps (CI + Justfile self-managed) | — |
-| medical | private | Settings only (no managed files) | — |
+| medical | private | Settings only (no managed files; Actions disabled) | — |
 
 ## Project Structure
 
@@ -109,6 +109,8 @@ renovate-config/
 9. **No `$comment` in `renovate.json`** — Renovate's config validator only whitelists `$schema` as an ignored key. Any other unrecognized field (including `$comment`) is rejected as an invalid config option. Use a YAML/JSON comment-less approach or put provenance in the managed-file header for non-JSON formats only.
 
 10. **Plan output exposes private repo files** — `infra-drift.yml` (`plan --ci --diff`) and the PR plan comment from `infra-plan.yml` print managed-file diffs for every repo into public Actions logs/PR comments. The desired side is the public templates, but drifted content from private repos is printed verbatim. Don't put secrets in managed files.
+
+11. **github-config's own workflows pin actions by full commit SHA** — `sha_pinning_required: true` on this repo makes GitHub reject any `uses:` with a tag or branch ref. Write `owner/action@<40-char SHA> # vX.Y.Z`; Renovate updates both. The release-app token these workflows mint can read and write every managed repo, so a retagged action must not be able to run here.
 
 ## Key Files by Task
 

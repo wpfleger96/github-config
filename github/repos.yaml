@@ -166,6 +166,11 @@ repositories:
     - gitops
     - renovate
     - gh-infra
+    # Every action in this repo's workflows is pinned to a full commit SHA:
+    # the release-app token they mint can read every managed repo.
+    actions:
+      enabled: true
+      sha_pinning_required: true
 - name: SNORE
   spec:
     visibility: public
@@ -255,4 +260,8 @@ repositories:
     - smart-on-fhir
     - health-records
     - self-hosted
+# medical has no code, so nothing should run there.
 - name: medical
+  spec:
+    actions:
+      enabled: false
