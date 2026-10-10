@@ -32,7 +32,7 @@ gh infra apply github/ --force-secrets     # Re-apply secrets (values can't be d
 | envsync | private | CI (CI+Deps+Justfile+Hooks) | `vars: system_packages: "libsqlcipher-dev"` on ci.yml |
 | BOOTLEG | private | CI (CI+Deps+Justfile+Hooks) | — |
 | chartright | private | Deps (CI + Justfile self-managed) | — |
-| medical | private | Settings only (no managed files; Actions disabled) | — |
+| medical | private | Settings only (no managed files) | — |
 
 ## Project Structure
 
