@@ -1,6 +1,7 @@
 apiVersion: gh-infra/v1
 kind: FileSet
 metadata:
+  name: justfile
   owner: wpfleger96
 
 spec:
