@@ -33,18 +33,19 @@ gh infra apply github/ --force-secrets     # Re-apply secrets (values can't be d
 | BOOTLEG | private | CI (CI+Deps+Justfile+Hooks) | — |
 | chartright | private | Deps (CI + Justfile self-managed) | — |
 | medical | private | Settings only (no managed files; Actions disabled) | — |
+| financial | private | Settings only (no managed files; Actions disabled) | — |
 
 ## Project Structure
 
 ```
 github/
-  files-all.yaml       # renovate.json + auto-approve.yml → 13 repos (all but github-config, medical)
+  files-all.yaml       # renovate.json + auto-approve.yml → 13 repos (all but github-config, medical, financial)
   files-ci.yaml        # ci.yml → 11 repos (github-config, homelabconfigs, chartright self-manage CI)
   files-full.yaml      # publish.yml → 3 PyPI repos
   files-hooks.yaml     # .hooks/pre-commit → 11 repos (github-config, homelabconfigs, chartright excluded)
   files-justfile.yaml  # Justfile → 10 repos (github-config, homelabconfigs, syncify, chartright excluded)
   files-release.yaml   # release.yml + release-please-config.json → 6 release-tier repos
-  repos.yaml           # RepositorySet: 15 repos (8 public, 7 private). Defaults = private profile;
+  repos.yaml           # RepositorySet: 16 repos (8 public, 8 private). Defaults = private profile;
                        # public-only settings via when/conditional_spec; visibility: public
                        # is per-entry; the e2e ruleset is a per-entry YAML anchor
   templates/           # ci-python.yml, Justfile, auto-approve.yml, publish.yml, pre-commit-hook,
