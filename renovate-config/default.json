@@ -3,8 +3,8 @@
   "description": "Shared Renovate preset for wpfleger96 repos",
   "extends": ["config:recommended"],
   "dependencyDashboard": true,
-  "prConcurrentLimit": 5,
-  "prHourlyLimit": 2,
+  "prConcurrentLimit": 0,
+  "prHourlyLimit": 0,
   "labels": ["dependencies"],
   "commitMessagePrefix": "chore(deps):",
   "platformAutomerge": true,
@@ -23,6 +23,10 @@
     "schedule": ["* * * * 4"]
   },
   "packageRules": [
+    {
+      "matchUpdateTypes": ["lockFileMaintenance"],
+      "minimumReleaseAge": null
+    },
     {
       "matchUpdateTypes": ["minor", "patch"],
       "automerge": true,
