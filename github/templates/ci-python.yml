@@ -42,7 +42,7 @@ jobs:
             recipe: test
 <%- if (index .Vars "web") %>
           - name: web
-            recipe: web-install web-check
+            recipe: web-check
 <%- end %>
 
     steps:
@@ -106,7 +106,14 @@ jobs:
 <%- if (index .Vars "web") %>
         if: matrix.name != 'web'
 <%- end %>
-        run: just sync
+        run: uv sync --locked
+<%- if (index .Vars "web") %>
+
+      - name: Install web dependencies
+        if: matrix.name == 'web'
+        working-directory: <% index .Vars "web" %>
+        run: <% if eq (index .Vars "web_pm") "pnpm" %>pnpm install --frozen-lockfile<% else %>npm ci<% end %>
+<%- end %>
 
       - name: Run ${{ matrix.name }}
         run: just ${{ matrix.recipe }}
@@ -154,7 +161,7 @@ jobs:
       <%- end %>
 
       - name: Install dependencies
-        run: just sync
+        run: uv sync --locked
 
       - name: Run end-to-end tests
         run: just test-e2e
