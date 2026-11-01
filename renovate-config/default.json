@@ -9,6 +9,7 @@
   "commitMessagePrefix": "chore(deps):",
   "platformAutomerge": true,
   "automergeType": "pr",
+  "timezone": "America/New_York",
   "schedule": ["* * 1 * *"],
   "minimumReleaseAge": "1 week",
   "internalChecksFilter": "strict",
