@@ -39,17 +39,22 @@ gh infra apply github/ --force-secrets     # Re-apply secrets (values can't be d
 
 ```
 github/
-  files-all.yaml       # renovate.json + auto-approve.yml → 13 repos (all but github-config, medical, financial)
+  files-all.yaml       # renovate.json + auto-approve.yml + pull_request_template.md → 13 repos
+                       # (all but github-config, medical, financial)
   files-ci.yaml        # ci.yml → 11 repos (github-config, homelabconfigs, chartright self-manage CI)
   files-full.yaml      # publish.yml → 3 PyPI repos
   files-hooks.yaml     # .hooks/pre-commit → 11 repos (github-config, homelabconfigs, chartright excluded)
+  files-issues.yaml    # .github/ISSUE_TEMPLATE/ issue forms → 7 public repos (all but github-config)
   files-justfile.yaml  # Justfile → 10 repos (github-config, homelabconfigs, syncify, chartright excluded)
   files-release.yaml   # release.yml + release-please-config.json → 6 release-tier repos
-  repos.yaml           # RepositorySet: 16 repos (8 public, 8 private). Defaults = private profile;
+  repos.yaml           # RepositorySet: 16 repos (8 public, 8 private). Defaults = private profile
+                       # (incl. the bug/enhancement labels the issue forms apply);
                        # public-only settings via when/conditional_spec; visibility: public
                        # is per-entry; the e2e ruleset is a per-entry YAML anchor
   templates/           # ci-python.yml, Justfile, auto-approve.yml, publish.yml, pre-commit-hook,
-                       # release.yml, release-please-config.json, renovate.json
+                       # release.yml, release-please-config.json, renovate.json,
+                       # pull_request_template.md, ISSUE_TEMPLATE/ (bug_report.yml,
+                       # feature_request.yml, config.yml)
 renovate-config/
   default.json         # Shared Renovate preset extended by all managed repos
 .github/workflows/     # ci.yml, infra-plan.yml, infra-apply.yml, infra-drift.yml
@@ -82,8 +87,9 @@ renovate-config/
 ```yaml
 # This file is managed by github-config. Do not edit manually.
 ```
+Exception: `pull_request_template.md` has no header. `squash_merge_commit_message: PR_BODY` makes the PR body the squash commit body, so any header or comment would land in every commit on `main`.
 
-**Self-managed CI** — repos with non-standard CI requirements (multi-component stacks, non-Python toolchains) own their `.github/workflows/ci.yml` directly. github-config manages only shared configs (`renovate.json`, `auto-approve.yml`) for these repos via `files-all.yaml`. Currently self-managed: github-config (Go-based gh-infra), homelabconfigs (Terraform + Ansible), chartright (pnpm/TypeScript monorepo). **Public self-managed repos need a per-repo override in their `repos.yaml` entry's `conditional_spec.rulesets`** unless their CI emits the contexts the default ruleset requires (`checks`). github-config's CI emits `checks`, so it needs no override.
+**Self-managed CI** — repos with non-standard CI requirements (multi-component stacks, non-Python toolchains) own their `.github/workflows/ci.yml` directly. github-config manages only shared configs (`renovate.json`, `auto-approve.yml`, the PR template) for these repos via `files-all.yaml`. Currently self-managed: github-config (Go-based gh-infra), homelabconfigs (Terraform + Ansible), chartright (pnpm/TypeScript monorepo). **Public self-managed repos need a per-repo override in their `repos.yaml` entry's `conditional_spec.rulesets`** unless their CI emits the contexts the default ruleset requires (`checks`). github-config's CI emits `checks`, so it needs no override.
 
 **E2E testing** — the `e2e` job in `ci-python.yml` is opt-in via `vars: e2e: "true"` in `files-ci.yaml`. Currently `ai-agent-rules`, `SNORE`, and `shell-configs` opt in. The default `main` ruleset requires only the `checks` context; each opted-in repo has a per-repo `conditional_spec.rulesets` override in `repos.yaml` that additionally requires `e2e` (defined once as `&main_e2e_ruleset` on `ai-agent-rules`, referenced as `*main_e2e_ruleset` elsewhere). The managed `Justfile` keeps e2e out of the fast run (`test: uv run pytest -m "not e2e"`) and runs them separately (`test-e2e`; `test-all` runs everything). Repos without e2e-marked tests pass trivially (the recipe tolerates pytest exit code 5 = no tests collected). To add e2e tests to a repo: create `tests/e2e/`, mark tests with `@pytest.mark.e2e`, register the marker in pyproject, and use `-m 'not e2e'` (not `--ignore`) in `addopts`.
 
@@ -124,6 +130,7 @@ renovate-config/
 | Update CI template | `github/templates/ci-python.yml` |
 | Update shared Justfile | `github/templates/Justfile` |
 | Update Renovate preset | `renovate-config/default.json` |
+| Update PR/issue templates | `github/templates/pull_request_template.md` (via `files-all.yaml`), `github/templates/ISSUE_TEMPLATE/` (via `files-issues.yaml`; labels they apply live in `repos.yaml` `defaults.spec.labels`) |
 | Change branch protection | `github/repos.yaml` → `defaults.conditional_spec.rulesets` (per-repo: entry `conditional_spec.rulesets`) |
 | Add repo secret/variable | `github/repos.yaml` per-repo `spec`, or `conditional_spec` for public-only ones (secret values must be `${ENV_*}` refs) |
 | Change infra workflows | `.github/workflows/infra-plan.yml` / `infra-apply.yml` / `infra-drift.yml` |

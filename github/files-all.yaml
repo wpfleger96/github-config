@@ -25,6 +25,8 @@ spec:
       source: ./templates/renovate.json
     - path: .github/workflows/auto-approve.yml
       source: ./templates/auto-approve.yml
+    - path: .github/pull_request_template.md
+      source: ./templates/pull_request_template.md
 
   via: push
   commit_message: |-
