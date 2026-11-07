@@ -23,6 +23,15 @@
     "automerge": true,
     "schedule": ["* * 1 * *"]
   },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "corepack installed via npm in a Dockerfile",
+      "managerFilePatterns": ["/(^|/)Dockerfile$/"],
+      "matchStrings": ["npm install -g (?<depName>corepack)@(?<currentValue>[0-9][^\\s]*)"],
+      "datasourceTemplate": "npm"
+    }
+  ],
   "packageRules": [
     {
       "matchUpdateTypes": ["lockFileMaintenance"],
