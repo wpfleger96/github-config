@@ -179,8 +179,12 @@ web-format:
 web-build:
     cd <% index .Vars "web" %> && <% index .Vars "web_pm" %> run build
 
-# Run all web UI quality checks
-web-check: web-type-check web-lint-check web-format-check
+# Run web UI unit tests
+web-test:
+    cd <% index .Vars "web" %> && <% index .Vars "web_pm" %> run test:unit
+
+# Run all web UI quality checks and unit tests
+web-check: web-type-check web-lint-check web-format-check web-test
 <%- end %>
 <%- if (index .Vars "shell") %>
 
