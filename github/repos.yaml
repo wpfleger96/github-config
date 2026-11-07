@@ -36,6 +36,15 @@ defaults:
       sha_pinning_required: false
       workflow_permissions: read
       can_approve_pull_requests: true
+    # The issue forms (files-issues.yaml) apply these labels; GitHub silently
+    # drops a form label that doesn't exist. Values match GitHub's defaults.
+    labels:
+    - name: bug
+      color: d73a4a
+      description: "Something isn't working"
+    - name: enhancement
+      color: a2eeef
+      description: "New feature or request"
   # Public-only settings, merged in at plan time against each repo's CURRENT
   # visibility (skipped for repos that don't exist yet). Hard GitHub Free
   # limits on private repos: rulesets (403), fork_pr_approval (rejected), and

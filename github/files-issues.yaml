@@ -1,0 +1,29 @@
+apiVersion: gh-infra/v1
+kind: FileSet
+metadata:
+  name: issues
+  owner: wpfleger96
+
+spec:
+  repositories:
+    - ai-agent-rules
+    - claude-code-status-line
+    - pagerduty-mcp-server
+    - JamBot
+    - SNORE
+    - shell-configs
+    - meowdb
+
+  files:
+    - path: .github/ISSUE_TEMPLATE/bug_report.yml
+      source: ./templates/ISSUE_TEMPLATE/bug_report.yml
+    - path: .github/ISSUE_TEMPLATE/feature_request.yml
+      source: ./templates/ISSUE_TEMPLATE/feature_request.yml
+    - path: .github/ISSUE_TEMPLATE/config.yml
+      source: ./templates/ISSUE_TEMPLATE/config.yml
+
+  via: push
+  commit_message: |-
+    chore: sync issue templates<% if .Source.URL %>
+
+    Source: <% .Source.URL %><% end %>
