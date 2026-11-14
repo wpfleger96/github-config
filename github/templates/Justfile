@@ -31,7 +31,7 @@ lint-python-check:
 
 # Run ShellCheck on shell scripts
 lint-shell-check:
-    shfmt -f . | grep -v git-prompt.sh | grep -v iterm2-shell-integration | grep -v 'src/shell_configs/scripts/' | xargs shellcheck
+    shfmt -f . | grep -v git-prompt.sh | grep -v iterm2-shell-integration | xargs shellcheck
 
 # Run Python formatter in check mode (no changes)
 format-python-check:
@@ -39,7 +39,7 @@ format-python-check:
 
 # Run shfmt on shell scripts in check mode (no changes)
 format-shell-check:
-    shfmt -f . | grep -v git-prompt.sh | grep -v iterm2-shell-integration | grep -v 'src/shell_configs/scripts/' | xargs shfmt -d
+    shfmt -f . | grep -v git-prompt.sh | grep -v iterm2-shell-integration | xargs shfmt -d
 
 # Code Quality - Fix variants
 
@@ -53,7 +53,7 @@ format-python:
 
 # Run shfmt on shell scripts and auto-fix style
 format-shell:
-    shfmt -f . | grep -v git-prompt.sh | grep -v iterm2-shell-integration | grep -v 'src/shell_configs/scripts/' | xargs shfmt -w
+    shfmt -f . | grep -v git-prompt.sh | grep -v iterm2-shell-integration | xargs shfmt -w
 
 # Composite quality checks
 
