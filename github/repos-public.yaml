@@ -5,15 +5,17 @@ metadata:
 
 # Public repos. Private repos live in repos-private.yaml. List each repo in
 # exactly one of the two files: gh-infra plans both entries, so a repo in both
-# flips between profiles on every apply. To change a repo's visibility, move
-# its entry to the other file.
+# flips between profiles on every apply. Changing a repo's visibility is not
+# always a plain move of its entry: see "Public and private RepositorySets" in
+# AGENTS.md.
 #
 # Every entry sets visibility: public itself rather than inheriting it from
 # defaults, so a private repo listed here by mistake fails to plan instead of
 # going public. The public-only settings stay in this file because GitHub Free
 # can't apply them to private repos: rulesets 403, fork_pr_approval is
-# rejected, and allow_auto_merge is silently ignored (infinite plan drift).
-# Private vulnerability reporting, workflow write permissions, and the
+# rejected, allow_auto_merge is silently ignored (infinite plan drift), and
+# secret scanning and push protection aren't offered on user-owned private
+# repos. Private vulnerability reporting, workflow write permissions, and the
 # release-app variables/secret are public-only by policy choice.
 defaults:
   reconcile:
@@ -56,6 +58,8 @@ defaults:
       vulnerability_alerts: true
       automated_security_fixes: false
       private_vulnerability_reporting: true
+      secret_scanning: true
+      secret_scanning_push_protection: true
     actions:
       enabled: true
       allowed_actions: all
