@@ -3,11 +3,17 @@ kind: RepositorySet
 metadata:
   owner: wpfleger96
 
-# Private repos. Public repos live in repos-public.yaml. Keep its public-only
-# settings out of this file: on GitHub Free private repos, rulesets 403,
-# fork_pr_approval is rejected, and allow_auto_merge is silently ignored
-# (infinite plan drift). To change a repo's visibility, move its entry to the
-# other file.
+# Private repos. Public repos live in repos-public.yaml. List each repo in
+# exactly one of the two files: gh-infra plans both entries, so a repo in both
+# flips between profiles on every apply (CI rejects duplicates). To change a
+# repo's visibility, move its entry to the other file; entries here never set
+# visibility (CI rejects it).
+#
+# This profile differs from the public one because GitHub Free can't apply
+# rulesets (403), fork_pr_approval (rejected), or allow_auto_merge (silently
+# ignored, infinite plan drift) to private repos. Private vulnerability
+# reporting, workflow write permissions, and the release-app variables/secret
+# are left off by policy choice.
 defaults:
   reconcile:
     labels: additive
@@ -31,8 +37,9 @@ defaults:
       color: a2eeef
       description: "New feature or request"
 
-    # Private profile. repos-public.yaml repeats these blocks with the
-    # public-only settings added or flipped; keep their other fields in sync.
+    # End of the block shared with repos-public.yaml. Private profile below;
+    # repos-public.yaml repeats these blocks with the public-only settings
+    # added or flipped, so keep their other fields in sync.
     visibility: private
     # merge_commit_title/message omitted: merge commits are disabled, and gh-infra
     # rejects changes to a disabled type's title/message (babarot/gh-infra#177).

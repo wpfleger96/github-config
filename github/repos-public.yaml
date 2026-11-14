@@ -3,13 +3,18 @@ kind: RepositorySet
 metadata:
   owner: wpfleger96
 
-# Public repos. Private repos live in repos-private.yaml. The public-only
-# settings stay in this file because GitHub Free can't apply them to private
-# repos: rulesets 403, fork_pr_approval is rejected, and allow_auto_merge is
-# silently ignored (infinite plan drift). Private vulnerability reporting,
-# workflow write permissions, and the release-app variables/secret are
-# public-only by policy choice. To change a repo's visibility, move its entry
-# to the other file.
+# Public repos. Private repos live in repos-private.yaml. List each repo in
+# exactly one of the two files: gh-infra plans both entries, so a repo in both
+# flips between profiles on every apply (CI rejects duplicates). To change a
+# repo's visibility, move its entry to the other file.
+#
+# Every entry sets visibility: public itself rather than inheriting it from
+# defaults, so a private repo listed here by mistake fails to plan instead of
+# going public. The public-only settings stay in this file because GitHub Free
+# can't apply them to private repos: rulesets 403, fork_pr_approval is
+# rejected, and allow_auto_merge is silently ignored (infinite plan drift).
+# Private vulnerability reporting, workflow write permissions, and the
+# release-app variables/secret are public-only by policy choice.
 defaults:
   reconcile:
     labels: additive
@@ -33,9 +38,9 @@ defaults:
       color: a2eeef
       description: "New feature or request"
 
-    # Public profile. repos-private.yaml repeats these blocks without the
-    # public-only settings; keep their other fields in sync.
-    visibility: public
+    # End of the block shared with repos-private.yaml. Public profile below;
+    # repos-private.yaml repeats these blocks without the public-only
+    # settings, so keep their other fields in sync.
     # merge_commit_title/message omitted: merge commits are disabled, and gh-infra
     # rejects changes to a disabled type's title/message (babarot/gh-infra#177).
     # Add them back in the same change if allow_merge_commit is ever enabled.
@@ -101,6 +106,7 @@ defaults:
 repositories:
 - name: ai-agent-rules
   spec:
+    visibility: public
     description: "Manage configs for Claude Code, Codex, Gemini CLI, Goose, and Amp from one repo — symlinks, merge pipeline, profile inheritance, cross-machine sync"
     topics:
     - python
@@ -145,6 +151,7 @@ repositories:
         required_signatures: false
 - name: claude-code-status-line
   spec:
+    visibility: public
     description: "Real-time status bar for Claude Code showing model, context usage, session cost, git state, and token counts via the native status line hook"
     topics:
     - python
@@ -153,6 +160,7 @@ repositories:
     - status-line
 - name: pagerduty-mcp-server
   spec:
+    visibility: public
     description: "MCP server exposing PagerDuty incidents, services, schedules, and on-calls to AI agents — read, acknowledge, resolve, with OAuth and API key auth"
     topics:
     - python
@@ -161,6 +169,7 @@ repositories:
     - llm
 - name: github-config
   spec:
+    visibility: public
     description: "Declarative GitHub repo configuration management (gh-infra + Renovate)"
     topics:
     - github
@@ -174,6 +183,7 @@ repositories:
       sha_pinning_required: true
 - name: SNORE
   spec:
+    visibility: public
     description: "Parses ResMed CPAP binary data, scores respiratory events against AASM clinical standards, and serves results via CLI, REST API, and Vue web UI"
     topics:
     - python
@@ -185,8 +195,11 @@ repositories:
     rulesets:
     - *main_e2e_ruleset
 - name: JamBot
+  spec:
+    visibility: public
 - name: meowdb
   spec:
+    visibility: public
     description: "Personal cat meow audio library — record, upload, and play back clips via CLI, REST API, and web UI"
     topics:
     - python
@@ -194,6 +207,7 @@ repositories:
     - sqlite
 - name: shell-configs
   spec:
+    visibility: public
     description: "Declarative dev environment manager — shell configs, packages, VS Code/Cursor settings and extensions, git, GPG signing, gh CLI extensions, and iTerm2 profiles"
     topics:
     - python
