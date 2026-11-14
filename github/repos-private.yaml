@@ -5,9 +5,8 @@ metadata:
 
 # Private repos. Public repos live in repos-public.yaml. List each repo in
 # exactly one of the two files: gh-infra plans both entries, so a repo in both
-# flips between profiles on every apply (CI rejects duplicates). To change a
-# repo's visibility, move its entry to the other file; entries here never set
-# visibility (CI rejects it).
+# flips between profiles on every apply. To change a repo's visibility, move
+# its entry to the other file; entries here never set visibility.
 #
 # This profile differs from the public one because GitHub Free can't apply
 # rulesets (403), fork_pr_approval (rejected), or allow_auto_merge (silently

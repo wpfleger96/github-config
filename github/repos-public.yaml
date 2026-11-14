@@ -5,8 +5,8 @@ metadata:
 
 # Public repos. Private repos live in repos-private.yaml. List each repo in
 # exactly one of the two files: gh-infra plans both entries, so a repo in both
-# flips between profiles on every apply (CI rejects duplicates). To change a
-# repo's visibility, move its entry to the other file.
+# flips between profiles on every apply. To change a repo's visibility, move
+# its entry to the other file.
 #
 # Every entry sets visibility: public itself rather than inheriting it from
 # defaults, so a private repo listed here by mistake fails to plan instead of

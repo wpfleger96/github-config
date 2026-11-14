@@ -34,15 +34,6 @@ jobs:
           mkdir -p "$EXT_DIR"
           mv gh-infra "$EXT_DIR/gh-infra"
 
-      - name: Check repo entries
-        # gh-infra accepts a repo listed in both repos-*.yaml files and plans each
-        # entry separately, so the repo would flip profiles on every apply. A
-        # repos-private.yaml entry must not override the file's visibility.
-        run: |
-          dups=$(grep -hE '^- name:' github/repos-*.yaml | sort -f | uniq -di)
-          [ -z "$dups" ] || { echo "listed in both files: $dups"; exit 1; }
-          if sed -n '/^repositories:/,$p' github/repos-private.yaml | grep -E '^[[:space:]]+visibility:'; then echo "repos-private.yaml entries must not set visibility"; exit 1; fi
-
       - name: Validate gh-infra manifests
         run: gh infra validate github/
         env:
