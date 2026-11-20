@@ -113,12 +113,16 @@ repositories:
     - smart-on-fhir
     - health-records
     - self-hosted
-# medical and financial have no code, so nothing should run there.
+# medical, financial, and learning-journal have no code, so nothing should run there.
 - name: medical
   spec:
     actions:
       enabled: false
 - name: financial
+  spec:
+    actions:
+      enabled: false
+- name: learning-journal
   spec:
     actions:
       enabled: false
