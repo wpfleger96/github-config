@@ -38,6 +38,12 @@
       "minimumReleaseAge": null
     },
     {
+      "description": "ghcr.io publishes no release timestamps, so minimumReleaseAge would hold its images forever.",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["ghcr.io/**"],
+      "minimumReleaseAge": null
+    },
+    {
       "matchUpdateTypes": ["minor", "patch"],
       "automerge": true,
       "groupName": "all non-major dependencies",
