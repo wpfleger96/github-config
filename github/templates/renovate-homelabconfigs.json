@@ -1,0 +1,13 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["github>wpfleger96/github-config//renovate-config/default"],
+  "packageRules": [
+    {
+      "description": "Own PR, never automerged: Home Assistant releases carry breaking changes.",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["ghcr.io/home-assistant/home-assistant"],
+      "automerge": false,
+      "groupName": null
+    }
+  ]
+}
