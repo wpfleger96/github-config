@@ -29,7 +29,7 @@ gh infra apply github/ --force-secrets     # Re-apply secrets (values can't be d
 | shell-configs | public | CI+Deps+Justfile+Hooks+Release | `vars: shell: "true"` on ci.yml + Justfile; `e2e: "true"` on ci.yml |
 | meowdb | public | CI+Deps+Justfile+Hooks+Release | — |
 | recall | private | CI (CI+Deps+Justfile) | `vars: git_identity: "true"` on ci.yml |
-| homelabconfigs | private | Deps (CI + Justfile self-managed) | — |
+| homelabconfigs | private | Deps (CI + Justfile self-managed) | `source: ./templates/renovate-homelabconfigs.json` on renovate.json (repo-specific `packageRules`) |
 | syncify | private | CI+Deps+Hooks (Justfile self-managed) | `vars: web: "ui/web", web_pm: "npm"` on ci.yml |
 | envsync | private | CI (CI+Deps+Justfile+Hooks) | `vars: system_packages: "libsqlcipher-dev"` on ci.yml |
 | BOOTLEG | private | CI (CI+Deps+Justfile+Hooks) | — |
@@ -57,6 +57,7 @@ github/
   repos-private.yaml   # RepositorySet: 9 private repos. Defaults = shared settings + private profile
   templates/           # ci-python.yml, Justfile, auto-approve.yml, publish.yml, pre-commit-hook,
                        # release.yml, release-please-config.json, renovate.json,
+                       # renovate-homelabconfigs.json,
                        # pull_request_template.md, ISSUE_TEMPLATE/ (bug_report.yml,
                        # feature_request.yml, config.yml)
 renovate-config/
@@ -138,7 +139,7 @@ Exception: `pull_request_template.md` has no header. `squash_merge_commit_messag
 | Distribute a new file | `github/templates/` + new or existing `files-*.yaml` (a new FileSet sets `metadata.name`) |
 | Update CI template | `github/templates/ci-python.yml` |
 | Update shared Justfile | `github/templates/Justfile` |
-| Update Renovate preset | `renovate-config/default.json` |
+| Update Renovate preset | `renovate-config/default.json` (all repos); one repo's extra rules go in a per-repo `renovate.json` override in `files-all.yaml`, never in the repo itself (the next apply overwrites it) |
 | Update PR/issue templates | `github/templates/pull_request_template.md` (via `files-all.yaml`), `github/templates/ISSUE_TEMPLATE/` (via `files-issues.yaml`; labels they apply live in `defaults.spec.labels` of both `repos-*.yaml` files) |
 | Change branch protection | `github/repos-public.yaml` → `defaults.spec.rulesets` (per-repo: entry `spec.rulesets`) |
 | Add repo secret/variable | per-repo `spec` in `github/repos-public.yaml` / `github/repos-private.yaml`, or `defaults.spec` for all repos in one visibility (secret values must be `${ENV_*}` refs) |

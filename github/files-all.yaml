@@ -13,7 +13,10 @@ spec:
     - recall
     - SNORE
     - shell-configs
-    - homelabconfigs
+    - name: homelabconfigs
+      overrides:
+        - path: renovate.json
+          source: ./templates/renovate-homelabconfigs.json
     - syncify
     - meowdb
     - envsync

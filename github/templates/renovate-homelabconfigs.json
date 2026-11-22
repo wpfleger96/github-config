@@ -1,0 +1,20 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["github>wpfleger96/github-config//renovate-config/default"],
+  "packageRules": [
+    {
+      "description": "ghcr.io publishes no release timestamps, so minimumReleaseAge would hold Home Assistant forever. Own PR, never automerged: releases carry breaking changes.",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["ghcr.io/home-assistant/home-assistant"],
+      "minimumReleaseAge": null,
+      "automerge": false,
+      "groupName": null
+    },
+    {
+      "description": "The tunnel connector fronts every public service, so take its fixes after a shorter soak.",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["cloudflare/cloudflared"],
+      "minimumReleaseAge": "3 days"
+    }
+  ]
+}
